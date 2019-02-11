@@ -1,0 +1,7 @@
+# useradd refuses to follow links, so can't really persist users & passwords
+# using this method:(
+#/etc/passwd
+#/etc/shadow
+#/etc/group
+
+/etc/gitconfig

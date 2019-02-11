@@ -1,0 +1,40 @@
+!
+! NOTE: using the old-school .Xdefaults rather than the newer .xResources
+! because adding xrdb requires another ~25-30MB of dependency baggage
+
+
+!
+! Settings for RXVT-Unicode
+!
+! login shell, so all your *profile & *rc files get executed
+URxvt*loginShell:      true
+!
+! when focus leaves, darken a bit
+URxvt*fading:          30
+!
+! Dark theme; white on black, and make the dark blues more
+! readable by setting them to Royal Blue
+URxvt*foreground:      White
+URxvt*background:      Black
+URxvt*color4:          RoyalBlue
+URxvt*color12:         RoyalBlue
+!
+! Set font to whatever "mono" is mapped to, with default size and other attributes
+URxvt*font:            xft:mono:pixelsize=14:antialias=true:hinting=true
+URxvt*boldFont:        xft:mono:pixelsize=14:antialias=true:hinting=true:bold
+URxvt*italicFont:      xft:mono:pixelsize=14:antialias=true:hinting=true:oblique
+URxvt*boldItalicFont:  xft:mono:pixelsize=14:antialias=true:hinting=true:bold:oblique
+!
+! let tmux handle scrollback; uncomment these lines if you don't use tmux
+!URxvt*saveLines:       12000
+!URxvt*scrollBar:       true
+!URxvt*scrollBar_right: false
+!URxvt*scrollstyle:     next
+!
+! Blinking underline cursor is nice
+URxvt*cursorBlink:     true
+URxvt*cursorUnderline: true
+!
+! Assume we have the font-size perl extension enabled, from
+! https://github.com/majutsushi/urxvt-font-size
+URxvt.perl-ext-common: font-size
