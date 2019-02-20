@@ -33,30 +33,14 @@ do
 
 	useradd -s /bin/bash -m -g users -G sudo $USERID "$USER";
 	echo "  * created user";
-	**** TODO: from here down.  Find gitconfig and use it to fill in the info below
-	FULLNAME=$(awk -F '= *' '/\[user\]/ {while (! /name *=/) {getline;} print $2; exit;}' "$CONFIG");
-	if [ -n "$FULLNAME" ]
-	then
-		FULLNAME=$(echo $FULLNAME |sed 's/\(.*\), *\(.*\)/\2 \1/'); # change "Last, First" to "First Last"
-		chfn -f "$FULLNAME" "$USER";
-		echo "  * with full name $FULLNAME";
-	else
-		echo "  * with no configured name in .gitconfig";
-	fi;
+
 
 	PASSWD=$(head -c 32 /dev/urandom |base64 |head -c 32);
 	echo "$USER:$PASSWD" | chpasswd;
-	echo "  * a random password";
+	echo "  * with random password";
 
 	cd /home/"$USER";
 	echo $PASSWD > .pwd; # Save password so user can sudo
-	# copy git "user" section from host home dir
-	if [ ! -f .gitconfig ]
-	then
-		sed -n '/\[user\]$/,/^[      ]*$/p' "$CONFIG" | dos2unix > .gitconfig;
-		echo "  * user & email copied from global git config file";
-	fi;
-
 	# copy public key(s) for SSH authentication
 	if [ ! -d .ssh ]
 	then
@@ -73,6 +57,29 @@ do
 	then
 		ln -s /hosthome/"$USER" /home/"$USER"/hosthome;
 		echo "  * symlinked "hosthome" to the host home directory";
+	fi;
+
+
+	# If host user has a git config file, fill in some more info here
+	CONFIG=/hosthome/"$USER"/.gitconfig;
+	[ -f "$CONFIG" ] || continue;
+
+	# set user account's full name based on contents of git config file
+	FULLNAME=$(awk -F '= *' '/\[user\]/ {while (! /name *=/) {getline;} print $2; exit;}' "$CONFIG");
+	if [ -n "$FULLNAME" ]
+	then
+		FULLNAME=$(echo $FULLNAME |sed 's/\(.*\), *\(.*\)/\2 \1/'); # change "Last, First" to "First Last"
+		chfn -f "$FULLNAME" "$USER";
+		echo "  * using full name $FULLNAME";
+	else
+		echo "  * no configured name in .gitconfig";
+	fi;
+
+	# copy git "user" section from host home dir
+	if [ ! -f .gitconfig ]
+	then
+		sed -n '/\[user\]$/,/^[      ]*$/p' "$CONFIG" | dos2unix > .gitconfig;
+		echo "  * user & email copied from global git config file";
 	fi;
 
 	echo "";

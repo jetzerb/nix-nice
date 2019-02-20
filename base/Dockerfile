@@ -12,10 +12,21 @@ RUN \
 # Install the packages we want
 DEBIAN_FRONTEND=noninteractive; $(: so no packages stop to ask us questions) \
 apt-get update; \
+#
+# Other packages mess with some configuration, which causes APT to
+# prompt for info regarding tzdata config.  Install this separately
+# as a workaround. Also, the libxtst6 package was throwing an
+# "Undetermined Error" when installed with the large group below,
+# so include that up front as well.
+apt-get -yq install --no-install-recommends \
+	tzdata                $(: so we know what time it is in our time zone) \
+	libxtst6              $(: required by packages below, but fails with "Undetermined Error" there) \
+; \
+#
+# Now install the rest of the packages
 apt-get -yq install --no-install-recommends \
 #
 # system level packages
-	tzdata                $(: so we know what time it is in our time zone) \
 	locales               $(: so we speak the right language) \
 	openssh-server        $(: so we can connect to our container via SSH) \
 	xauth                 $(: facilitates X11 forwarding in SSH) \
@@ -25,12 +36,10 @@ apt-get -yq install --no-install-recommends \
 	dbus-x11              $(: so apps like Meld can persist their preferences) \
 	at-spi2-core          $(: prevent "Error retrieving accessibility bus" warnings in gtk apps) \
 	xclip                 $(: clipboard manager for X) \
-	iputils-ping          $(: who ever heard of not being able to ping other servers?) \
 #
 # basic operating environment
 	busybox               $(: lots of utilities in one binary) \
-#	unzip                 $(: so we can unzip files -- part of busybox) \
-#	less                  $(: less pkg makes git diff and log colorful -- part of busybox) \
+	less                  $(: less pkg makes git diff and log colorful -- use this instead of busy/toy box) \
 	coreutils             $(: because having core utilities is just smart) \
 	tree                  $(: view indented directory structure) \
 	diffutils             $(: sdiff is nice) \
@@ -38,7 +47,7 @@ apt-get -yq install --no-install-recommends \
 	bash                  $(: standard-ish shell) \
 	bash-completion       $(: tab completion for bash, including git branches) \
 	perl                  $(: when grep, sed, and awk just are not enough) \
-	zip                   $(: so we can zip in addition to unzipping) \
+	zip                   $(: so we can zip in addition to unzipping which toy/busy box can do) \
 	neovim                $(: vi compatible editor, vim refactored) \
 	tmux                  $(: terminal multiplexer) \
 	sudo                  $(: let the users play--this is just a container) \
@@ -98,14 +107,14 @@ mkdir -p /tmp/install; \
 # rg > ag > ack > grep
 cd /tmp/install; \
 URL=https://github.com/BurntSushi/ripgrep/releases; \
-wget $(lynx --dump $URL |grep "$URL.*download.*ripgrep.*amd64\.deb$" | sed -n '1{s/.*http/http/;p;}'); \
+wget $(wget -O - "$URL" |sed -n '/href=".*ripgrep.*amd64\.deb"/ {s!.*href="\([^"]*\)".*!https://github.com\1!; p;}' |head -1;); \
 dpkg -i ripgrep*.deb; \
 #
 # Install xsv (parse delimited files)
 cd /tmp/install; \
 mkdir -p /opt/xsv/bin; \
 URL=https://github.com/BurntSushi/xsv/releases; \
-wget $(lynx --dump $URL |grep "$URL.*download.*xsv.*x86.*64.*linux.*gz" | sed -n '1{s/.*http/http/;p;}'); \
+wget $(wget -O - "$URL" |sed -n '/href=".*xsv.*x86.*64.*linux.*gz"/ {s!.*href="\([^"]*\)".*!https://github.com\1!; p;}' |head -1;); \
 tar -xzf xsv*.gz; \
 mv xsv /opt/xsv/bin; \
 #
@@ -113,7 +122,7 @@ mv xsv /opt/xsv/bin; \
 cd /tmp/install; \
 mkdir -p /opt/trdsql/bin; \
 URL=https://github.com/noborus/trdsql/releases; \
-wget $(lynx --dump $URL | grep "$URL.*trdsql.*linux.*64.*zip" | sed -n '1{s/.*http/http/;p;}'); \
+wget $(wget -O - "$URL" |sed -n '/href=".*trdsql.*linux.*64.*zip"/ {s!.*href="\([^"]*\)".*!https://github.com\1!; p;}' |head -1;); \
 unzip -o trdsql*.zip; \
 cd trdsql*linux*; \
 mv trdsql /opt/trdsql/bin/; \
@@ -126,14 +135,14 @@ mv config.json.sample /etc/skel/.config/trdsql/config.json; \
 cd /tmp/install; \
 for CMD in bat hexyl; do \
 	URL=https://github.com/sharkdp/$CMD/releases; \
-	wget $(lynx --dump $URL |grep "$URL.*download.*${CMD}.*amd64\.deb$" | grep -v 'musl' | sed -n '1{s/.*http/http/;p;}'); \
+	wget $(wget -O - "$URL" |sed -n '/href=".*'$CMD'.*amd64\.deb"/ {s!.*href="\([^"]*\)".*!https://github.com\1!; p;}' |head -1;); \
 	dpkg -i ${CMD}*.deb; \
 done; \
 #
 # One can never have too many hex editors.
 cd /tmp/install; \
 URL=https://github.com/evanmiller/hecate/releases; \
-wget $(lynx --dump $URL |grep "$URL.*download.*hecate.*amd64\.deb$" | sed -n '1{s/.*http/http/;p;}'); \
+wget $(wget -O - "$URL" |sed -n '/href=".*hecate.*amd64\.deb"/ {s!.*href="\([^"]*\)".*!https://github.com\1!; p;}' |head -1;); \
 dpkg -i hecate*.deb; \
 #
 # Install perl extension to adjust urxvt font size on the fly
@@ -154,7 +163,8 @@ rm master.zip; \
 cd .tmux-master; \
 dos2unix .tmux.conf*; $(: just in case) \
 # add weather to the status line, and enable powerline glyphs
-sed -i -e '/tmux_conf_theme_status_right/{s/synchronized} /&#(curl wttr.in?format=3) /;}' \
+sed -i -e '/^#.*navigation/{s/.*/# nix-nice: set terminal to "tmux" so we can have italics\nset -g default-terminal "tmux"\n&/;}' \
+       -e '/tmux_conf_theme_status_right/{s/synchronized} /&#(curl wttr.in?format=3) /;}' \
        -e '/#tmux_conf_theme_.*_separator_/{s/^#//;}' \
 	.tmux.conf.local; \
 cp .tmux.conf /etc/profile.d/tmux.conf; \
@@ -164,12 +174,8 @@ cp .tmux.conf.local /etc/skel; \
 # Overlay powerline fonts
 cd /usr/share/fonts/truetype/dejavu/; \
 rm *Mono*; \
-(IFS=$'\n'; \
- lynx --dump https://github.com/powerline/fonts/blob/master/DejaVuSansMono \
- | sed -n '/http.*ttf$/ { s/.*http/http/; s!/blob/!/raw/!; p;}' \
- | while read URL; do \
- 	wget "$URL"; \
- done;); \
+URL=https://github.com/powerline/fonts/blob/master/DejaVuSansMono; \
+wget $(wget -O - "$URL" |sed -n '/href=".*Mono.*ttf"/ {s!.*href="\([^"]*\)".*!https://github.com\1!; s!/blob/!/raw/!; p;}'); \
 #
 # fuzzy finder
 cd /opt; \
@@ -210,10 +216,7 @@ echo "Done with major installation and configuration";
 #
 #
 # Set up customizations and additions to the system
-COPY filesystem/ /
-#
-# now our container startup scripts
-COPY ../container/filesystem/ /
+COPY fs/ /
 
 #
 # Expose the standard SSH port
@@ -221,5 +224,5 @@ EXPOSE 22
 
 # entry point creates users inside the container, based on the users
 # present in the /hosthome bind mount
-ENTRYPOINT ["/usr/local/sbin/container_startup.sh"]
+ENTRYPOINT ["/usr/local/sbin/container-startup.sh"]
 CMD ["-epus"]

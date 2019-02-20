@@ -11,7 +11,7 @@ IFS=$'\n\t';
 ME=$(basename "$0");
 
 # set base git repo url
-if [ -n "${MYGITURL:-}" ]
+if [ -n "${MYGITURL:-}" ] && [ -f /etc/gitconfig ]
 then
 	echo "$ME...Setting Git URL to $MYGITURL";
 	sed -i "s!MYGITURL!$MYGITURL!" /etc/gitconfig;

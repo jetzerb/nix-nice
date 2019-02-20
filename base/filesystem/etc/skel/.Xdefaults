@@ -28,6 +28,7 @@ URxvt*boldItalicFont:  xft:mono:pixelsize=14:antialias=true:hinting=true:bold:ob
 ! let tmux handle scrollback; uncomment these lines if you don't use tmux
 !URxvt*saveLines:       12000
 !URxvt*scrollBar:       true
+URxvt*scrollBar:       false
 !URxvt*scrollBar_right: false
 !URxvt*scrollstyle:     next
 !
