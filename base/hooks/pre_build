@@ -1,0 +1,48 @@
+#!/bin/sh
+
+echo "I am $0";
+echo "Pre-Build Hook Start DateTime: $(date)";
+
+REPODIR=$(git rev-parse --show-toplevel);
+
+cat <<EOF
+SOURCE_BRANCH:   $SOURCE_BRANCH
+SOURCE_COMMIT:   $SOURCE_COMMIT
+COMMIT_MSG:      $COMMIT_MSG
+DOCKER_REPO:     $DOCKER_REPO
+DOCKERFILE_PATH: $DOCKERFILE_PATH
+CACHE_TAG:       $CACHE_TAG
+IMAGE_NAME:      $IMAGE_NAME
+
+PWD:             $PWD
+REPODIR:         $REPODIR
+
+EOF
+
+# Docker Docs don't say what dir context is provided for hooks,
+# so take no chances.
+cd "$REPODIR/base";
+
+
+# Make combined filesystem
+cp -a filesystem fs;
+cp -a ../container/filesystem/* fs;
+
+cat <<EOF > fs/etc/motd
+================================================================================
+
+                         Generic Ubuntu-based Linux Environment
+                         Image: $IMAGE_NAME
+
+                Container build date: $(date +"%F %T %z")
+
+================================================================================
+EOF
+
+
+# ensure *NIX line endings everywhere before copying into the image
+for FILE in $(find fs -type f)
+do
+	dos2unix "$FILE";
+	[ "${FILE##*.}" == "sh" ] && chmod 755 "$FILE";
+done;

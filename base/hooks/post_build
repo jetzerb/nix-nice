@@ -1,0 +1,12 @@
+#!/bin/sh
+
+
+# Docker Docs don't say what dir context is provided for hooks,
+# so take no chances.
+REPODIR=$(git rev-parse --show-toplevel);
+cd "$REPODIR/base";
+
+# clean up after ourselves
+rm -rf fs;
+
+echo "Post-Build Hook End DateTime: $(date)";
