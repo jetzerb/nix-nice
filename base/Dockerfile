@@ -234,5 +234,5 @@ EXPOSE 22
 
 # entry point creates users inside the container, based on the users
 # present in the /hosthome bind mount
-ENTRYPOINT ["/usr/local/sbin/container-startup.sh"]
+ENTRYPOINT ["/opt/nix-nice/sbin/container-startup.sh"]
 CMD ["-epus"]

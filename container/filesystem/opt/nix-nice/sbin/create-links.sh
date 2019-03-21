@@ -8,7 +8,7 @@ IFS=$'\n\t';
 # the container starts, create links as necessary.
 #
 
-cd /usr/local;
+cd /opt/nix-nice;
 find . -type f |
 while read FILE
 do

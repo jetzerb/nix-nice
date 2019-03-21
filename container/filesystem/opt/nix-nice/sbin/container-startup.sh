@@ -49,10 +49,10 @@ done;
 	echo -e "\n============================================================";
 	echo "$(date +'%Y-%m-%d %H:%M:%S %:z (%a, %Z)') Container Startup Script Execution";
 	echo "Full commandline: $@";
-	/usr/local/sbin/create-links.sh;
-	[ -n "${ENVIRO:-}"  ] && /usr/local/sbin/environment-setup.sh;
-	[ -n "${PERSIST:-}" ] && echo "No persistent file restore yet"; #/usr/local/sbin/persistfs-sync.sh;
-	[ -n "${USERS:-}"   ] && /usr/local/sbin/create-users.sh;
+	/opt/nix-nice/sbin/create-links.sh;
+	[ -n "${ENVIRO:-}"  ] && /opt/nix-nice/sbin/environment-setup.sh;
+	[ -n "${PERSIST:-}" ] && echo "No persistent file restore yet"; #/opt/nix-nice/sbin/persistfs-sync.sh;
+	[ -n "${USERS:-}"   ] && /opt/nix-nice/sbin/create-users.sh;
 	if [ -n "${SERVICES:-}" ]
 	then
 		echo "Starting dbus daemon";
