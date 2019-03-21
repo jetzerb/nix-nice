@@ -1,7 +1,7 @@
 FROM ubuntu:18.10
 
 LABEL about="Generic Ubuntu-based Linux environment"
-LABEL features="meld, neovim, ripgrep, tmux, trdsql, xsv, bat, fzf"
+LABEL features="meld, neovim, ripgrep, tmux, trdsql, xsv, bat, fzf, ddgr, tldr"
 LABEL access="SSH, key authentication, X11 forwarding"
 LABEL maintainer="jetzerb@sva.com"
 
@@ -50,6 +50,7 @@ apt-get -yq install --no-install-recommends \
 	zip                   $(: so we can zip in addition to unzipping which toy/busy box can do) \
 	neovim                $(: vi compatible editor, vim refactored) \
 	tmux                  $(: terminal multiplexer) \
+	ncurses-term          $(: to get tmux entries--as of 18.10 rxvt installs ncurses-base instead) \
 	sudo                  $(: let the users play--this is just a container) \
 #
 # additional tools
@@ -176,6 +177,15 @@ cd /usr/share/fonts/truetype/dejavu/; \
 rm *Mono*; \
 URL=https://github.com/powerline/fonts/blob/master/DejaVuSansMono; \
 wget $(wget -O - "$URL" |sed -n '/href=".*Mono.*ttf"/ {s!.*href="\([^"]*\)".*!https://github.com\1!; s!/blob/!/raw/!; p;}'); \
+#
+# tldr bash client with colorful output
+cd /opt; \
+mkdir -p tldr/bin; \
+cd /opt/tldr/bin; \
+wget https://4e4.win/tldr; \
+chmod +x tldr; \
+echo 'cachedir=~/.local/share/tldr' >> /etc/skel/.bashrc; $(: not using xdg, so this is cache dir) \
+echo 'complete -W "$(q=($cachedir/*/*); sed '"'s@\.md @ @g'"' <<<${q[@]##*/})" tldr' >> /etc/skel/.bashrc; $(: auto complete for tldr) \
 #
 # fuzzy finder
 cd /opt; \
