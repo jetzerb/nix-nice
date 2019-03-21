@@ -47,7 +47,7 @@ unset myVI myEXE myLESS;
 
 
 # nobody likes to type ".sh"
-for myCMD in /usr/local/bin/*.sh /opt/*/bin/*.sh
+for myCMD in $(find /opt/*/bin /usr/local/bin -type f -name '*.sh')
 do
 	alias $(basename ${myCMD%.sh})=$myCMD;
 done;
