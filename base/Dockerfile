@@ -156,6 +156,25 @@ dos2unix font-size; $(: just in case) \
 mkdir -p /etc/skel/.urxvt/ext/; \
 mv font-size /etc/skel/.urxvt/ext/; \
 #
+# Install "The Ultimate Vim Configuration"
+cd /etc/profile.d; \
+wget https://github.com/amix/vimrc/archive/master.zip; \
+unzip master.zip; \
+rm master.zip; \
+mv vimrc-master vim_runtime; \
+mkdir -p /etc/skel/.config/nvim; \
+cd /etc/skel/.config/nvim; \
+/etc/profile.d/vim_runtime/install_awesome_parameterized.sh /etc/profile.d/vim_runtime root; \
+mv ~/.vimrc ./init.vim; \
+sed -i 's![^ \]*\(/my_configs\)!~/.config/nvim\1!;' init.vim; \
+# until git is installed, move some of the awesomeness out of the way
+cd /etc/profile.d/vim_runtime; \
+for FILE in $(rg -il -g '*.vim' 'git.executable'  |sed 's!\([^/]*/[^/]*\)/.*!\1!;' |sort -u); \
+do \
+	mkdir -p zz${FILE%/*}; \
+	mv $FILE zz${FILE%/*}; \
+done; \
+#
 # Install "pretty and versatile" tmux configuration
 cd /tmp/install; \
 wget https://github.com/gpakosz/.tmux/archive/master.zip; \
