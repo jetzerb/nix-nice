@@ -1,4 +1,4 @@
-# Dev-Nice
+# Nix-Nice
 My \*NIX environment: Packages, profile, scripts, etc, for every day use
 and/or software development, either on a dedicated machine or a container.
 
@@ -9,7 +9,9 @@ The primary motivators for this project are to
   Subsystem for
   Linux](https://docs.microsoft.com/en-us/windows/wsl/about), because of
   how [SLOW](https://rufflewind.com/2014-08-23/windows-bash-slow)
-  those environments are.
+  those environments are.  Things have gotten better some time in later
+  2018, so that WSL is not nearly as slow as it used to be, but still
+  pretty inconvenient.
 
 ## Layout
 In order to appeal to a wide audience, there are multiple layers of
@@ -23,7 +25,7 @@ files
 ## Docker Container
 If you configure your Windows >= 10 or Server >= 2016 to use Docker,
 you can run a linux container, which uses an actual Linux kernel, and get
-things done in 1% of the time required by non-native Linux-on-Windows
+things done in 1-10% of the time required by non-native Linux-on-Windows
 solutions.
 
 **NOTE**: If you use a bind mount to share your files between the
@@ -46,7 +48,7 @@ ways:
   on the host
 - sethost: copy files from the container to the corresponding location
   on the host
-- gethost: copy froms from the corresponding location on the host to
+- gethost: copy files from the corresponding location on the host to
   the container
 
 Open Item list:
@@ -56,7 +58,7 @@ Open Item list:
   will cache the credentials for 10 hours, so you should only need to
   enter your name & token once per day.
 - The original image is based on Alpine Linux because the resulting container
-  image builds faster is is much smaller than the corresponding Ubuntu-based
+  image builds faster and is much smaller than the corresponding Ubuntu-based
   image.  However, Alpine is based on the [musl](https://www.musl-libc.org/)
   c library, rather than [glibc](https://www.gnu.org/software/libc/).
   Electron (the framework upon which Atom, VS Code, SQL Ops Studio, and
@@ -86,6 +88,7 @@ Open Item list:
   - [#262](https://github.com/Microsoft/mssql-docker/issues/262)
   - [#273](https://github.com/Microsoft/mssql-docker/issues/273)
 - VS Code is quite sluggish using X forwarding.  Couldn't get x2go Windows
-  client work.  Try other nx solutions to see if they are any better?
+  client work.  There is much better performance when coding in a browser
+  via [code-server](https://github.com/cdr/code-server).
 - Allow LCOW?  Currently, the `--mount` syntax doesn't work.  I'm sure
   there are other issues as well.
