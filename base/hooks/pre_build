@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "I am $0";
+echo "I am [$0]";
 echo "Pre-Build Hook Start DateTime: $(date)";
 
 REPODIR=$(git rev-parse --show-toplevel);
@@ -14,9 +14,10 @@ DOCKERFILE_PATH: $DOCKERFILE_PATH
 CACHE_TAG:       $CACHE_TAG
 IMAGE_NAME:      $IMAGE_NAME
 
+SHELL:           $SHELL
 PWD:             $PWD
 REPODIR:         $REPODIR
-
+. . .
 EOF
 
 # Docker Docs don't say what dir context is provided for hooks,
@@ -43,6 +44,12 @@ EOF
 # ensure *NIX line endings everywhere before copying into the image
 for FILE in $(find fs -type f)
 do
-	dos2unix "$FILE";
-	[ "${FILE##*.}" == "sh" ] && chmod 755 "$FILE";
+	# Docker build server doesn't have dos2unix, do it the long way
+	tr -d '\r' <"$FILE" >tmp$$ && cp tmp$$ "$FILE" && rm tmp$$;
+
+	# ensure correct permissions on shell scripts
+	if [ "$(echo -n $FILE |tail -c 3)" = ".sh" ]
+	then
+		chmod 755 "$FILE";
+	fi;
 done;
