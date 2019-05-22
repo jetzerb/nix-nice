@@ -5,6 +5,7 @@
 
 # Let the Dockerfile do most of the work
 sed '1,/SOFTWARE INSTALL START/d;
+     /^RUN /d;
      /SOFTWARE INSTALL END/,$d;
      /^#/d;' Dockerfile > /tmp/install$$;
 /bin/sh /tmp/install$$;

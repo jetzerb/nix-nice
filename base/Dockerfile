@@ -1,10 +1,14 @@
+# Base layer
 FROM ubuntu:18.10
 
+# Container attributes...
 LABEL about="Generic Ubuntu-based Linux environment"
-LABEL features="meld, neovim, ripgrep, tmux, trdsql, xsv, bat, fzf, ddgr, tldr"
+LABEL features="meld, neovim, ripgrep, tmux, trdsql, xsv, bat, fd, fzf, ddgr, tldr"
 LABEL access="SSH, key authentication, X11 forwarding"
 LABEL maintainer="jetzerb@sva.com"
 
+#
+# First layer = various Ubuntu packages
 RUN \
 #
 # SOFTWARE INSTALL START
@@ -71,34 +75,44 @@ apt-get -yq install --no-install-recommends \
 #       powerline patched dejavu fonts added below
 ; \
 #
-# For whatever reason, installing busybox on Ubuntu doesn't create symlinks
-# so do it here
-echo "Creating busybox links:"; \
-busybox --list | \
-while read CMD; \
-do \
-	RESULT="$(type $CMD 2>&1)"; \
-	if [ "$RESULT" != "${RESULT%*not found*}" ]; \
-	then \
-		echo "	$CMD"; \
-		ln -s /bin/busybox /bin/$CMD; \
-	fi; \
-done; \
+# remove package lists to trim > 20MB of cruft
+rm -rf /var/lib/apt/lists/*;
+
+
+
 #
-# ToyBox and BusyBox don't overlap completely, so add both
+# Second layer = additional apps to make life better
+#
+
+RUN \
+#
+# ToyBox and BusyBox don't overlap completely, so add both.
 mkdir -p /opt/toybox/bin; \
 cd /opt/toybox/bin; \
 wget -O toybox http://landley.net/toybox/bin/toybox-x86_64; \
 chmod +x toybox; \
-echo "Creating toybox links:"; \
-for CMD in $(./toybox --long); \
+#
+# Per http://enkidu.eu/bbtbmergerzip, use TB when you can,
+# and BB for the rest.  Note that the linked script says
+# to use BB instead of TB for head, tail, gzip.  But those
+# issues have probably been fixed since Feb 2016 when
+# that script was written, and those commands are already
+# installed via the apt instructions above, so no override
+# is implemented here.
+for LIST in "/opt/toybox/bin/toybox --long" "/bin/busybox --list-full"; \
 do \
-	RESULT="$(type ${CMD##*/} 2>&1)"; \
-	if [ "$RESULT" != "${RESULT%*not found*}" ]; \
-	then \
-		echo "	$CMD"; \
-		ln -s /opt/toybox/bin/toybox /$CMD; \
-	fi; \
+	EXE=${LIST% *}; \
+	echo "Creating links for $EXE:"; \
+	for CMD in $($LIST); \
+	do \
+		BASECMD=${CMD##*/}; \
+		case "$(type $BASECMD 2>&1)" in \
+			*"not found"*) \
+				echo "	$CMD"; \
+				ln -s $EXE /$CMD; \
+				;; \
+		esac; \
+	done; \
 done; \
 #
 # prep area for additional downloads that don't exist in the Ubuntu package repositories
@@ -134,9 +148,9 @@ mv config.json.sample /etc/skel/.config/trdsql/config.json; \
 # Install bat (pager w/syntax highlighting and git integration; can be used as replacement for cat)
 # Install hexyl (colorized hex dump utility)
 cd /tmp/install; \
-for CMD in bat hexyl; do \
+for CMD in bat fd hexyl; do \
 	URL=https://github.com/sharkdp/$CMD/releases; \
-	wget $(wget -O - "$URL" |sed -n '/href=".*'$CMD'.*amd64\.deb"/ {s!.*href="\([^"]*\)".*!https://github.com\1!; p;}' |head -1;); \
+	wget $(wget -O - "$URL" |sed -n '/musl/d; /href=".*'$CMD'.*amd64\.deb"/ {s!.*href="\([^"]*\)".*!https://github.com\1!; p;}' |head -1;); \
 	dpkg -i ${CMD}*.deb; \
 done; \
 #

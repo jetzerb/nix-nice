@@ -51,7 +51,76 @@ ways:
 - gethost: copy files from the corresponding location on the host to
   the container
 
-Open Item list:
+### How to use the container
+#### Create SSH Keys
+You get into the container via ssh using key-based authentication.
+The container startup script assumes there's a /hosthome mount and looks
+for users with a ".ssh" folder, and then proceeds to create each of those
+users inside the container and copies in the user's public key. So each
+interested user should run `ssh-keygen` if they don't yet have keys.
+#### Optionally Create Docker Volume
+If you plan to use the container for development purposes, you'll
+definitely want to create a volume to mount as `/home` so that your work
+survives container restarts.
+
+```sh
+docker volume create userdata
+```
+
+#### Start the Container
+See `container_start*` files in the `container` folder of the
+[nix-nice](https://github.com/jetzerb/nix-nice) git repo.  On windows,
+you'd issue a command like this:
+```dos
+docker run --detach ^
+-e "MYTZ=America/Chicago" ^
+-e "MYLOCALE=en_US.utf8" ^
+--mount type=bind,source="C:\Users",target=/hosthome ^
+--mount type=volume,source=userdata,target=/home ^
+-p 9922:22 ^
+-h nix-nice ^
+--name nix-nice ^
+jetzerb/nix-nice:TagNameGoesHere ^
+-eus
+```
+
+The `MYTZ` and `MYLOCALE` variables cause the container startup script
+to set the container's time zone, and generate the specified locale.
+
+The `hosthome` bind mount is required if users are to `ssh` into the
+container.
+
+The `userdata` volume mount holds users' home directories in the
+container, so that when the container is re-started, their data is
+persisted.
+
+The `-p` option maps the desired port to the container's SSH port.
+You can use 22 if you like, or any other port.
+
+The `-h` option sets the host name.
+
+The `--name` option sets the docker container name (as displayed by
+`docker ps`).
+
+Be sure to specify the desired tag name in place of `TagNameGoesHere`.
+
+The final list of options are
+- `-e`: set up environment variables
+- `-u`: create users, based on the `/hosthome` mount
+- `-s`: start the SSH service
+
+
+In a \*NIX environment, you'd issue the same command as above, but with
+backslashes (\\) instead of carets (^) as the line continuation character,
+and you'd specify `/home` in place of `C:\Users` in the bind mount.
+
+#### Connect to the Container
+Use `ssh` to connect to the container.  You may use X11 forwarding.
+On Windows, I recommend using [SmarTTY](http://sysprogs.com/SmarTTY/),
+since it comes bundled with an X server.
+
+
+### Open Item list
 - [Git Credential Manager for Mac & Linux](https://github.com/Microsoft/Git-Credential-Manager-for-Mac-and-Linux)
   requires a java runtime, which significantly bloats the container size.
   For now, just use Personal Access Tokens.  The default git config file

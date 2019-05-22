@@ -19,8 +19,8 @@ do
 	fi;
 	echo "Creating user $USER";
 
-	# if pre-existing home dir, get the UID
-	USERID=
+	# if pre-existing home dir, get the UID and current password
+	unset USERID PASSWD;
 	if [ -d /home/"$USER" ]
 	then
 		USERID=$(ls -ld /home/"$USER" | awk '{print $3}');
@@ -28,19 +28,26 @@ do
 		then
 			echo "  * found existing home dir with User ID $USERID";
 			USERID="-u $USERID";
+			PASSWD=$(tr -d '\r\n' </home/"$USER"/.pwd);
 		fi;
 	fi;
 
 	useradd -s /bin/bash -m -g users -G sudo $USERID "$USER";
 	echo "  * created user";
-
-
-	PASSWD=$(head -c 32 /dev/urandom |base64 |head -c 32);
-	echo "$USER:$PASSWD" | chpasswd;
-	echo "  * with random password";
-
 	cd /home/"$USER";
-	echo $PASSWD > .pwd; # Save password so user can sudo
+
+	if [ -z "$PASSWD" ]
+	then
+		PASSWD=$(head -c 32 /dev/urandom |base64 |head -c 32);
+		echo $PASSWD > .pwd;
+		chmod 600      .pwd; # owner can read/write, no one else can do anything
+		chown "$USER"  .pwd; # transfer ownership to the user
+		echo "  * with random password";
+	else
+		echo "  * with existing password";
+	fi;
+	echo "$USER:$PASSWD" | chpasswd;
+
 	# copy public key(s) for SSH authentication
 	if [ ! -d .ssh ]
 	then
