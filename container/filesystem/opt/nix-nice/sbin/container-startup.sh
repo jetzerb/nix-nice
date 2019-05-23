@@ -19,6 +19,7 @@ IFS=$'\n\t';
 #
 usage() {
 	cat <<EOF >&2
+Invalid flag specified in "$@";
 Usage: $0 [-e] [-p] [-u] [-s]
 	-e to handle environment variables passed in at container startup
 	-p TODO: to restore persisted files, based on persistfs volume mount
@@ -40,7 +41,7 @@ do
 		p) PERSIST=1;;
 		u) USERS=1;;
 		s) SERVICES=1;;
-		*) usage;;
+		*) usage "$@";;
 	esac;
 done;
 
@@ -60,8 +61,7 @@ done;
 		echo "Starting SSH daemon";
 		service ssh start;
 	fi;
-
 ) 2>&1 | tee -a /var/log/$(basename "$0");
 
 # keep container running after doing all of the above
-sleep infinity;
+exec sleep infinity;

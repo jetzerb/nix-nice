@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # get version info based on tag attached to HEAD commit
-VER=$(git log -1 --format='%D' |sed -n '/tag:/{s/.*tag: *//; s/ .*//; p;}');
+VER=$(git log -1 --format='%D' |sed -n '/tag:/{s/.*tag: *//; s/ .*//; s/,.*//; p;}');
 
 if [ -z "$VER" ]
 then
@@ -24,7 +24,7 @@ echo "Building Image $IMAGE_NAME";
 hooks/pre_build;
 
 # now build the image
-docker build -t $IMAGE_NAME .;
+docker build -t "$IMAGE_NAME" .;
 
 # do any cleanup work
 hooks/post_build;

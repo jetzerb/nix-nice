@@ -20,11 +20,11 @@ do
 	echo "Creating user $USER";
 
 	# if pre-existing home dir, get the UID and current password
-	unset USERID PASSWD;
+	USERID=; PASSWD=;
 	if [ -d /home/"$USER" ]
 	then
 		USERID=$(ls -ld /home/"$USER" | awk '{print $3}');
-		if [ "$USERID" -eq "$USERID" ] && [ "$USERID" -gt 0 ] 2> /dev/null # i.e. if USERID is numeric and not root user
+		if ([ "$USERID" -eq "$USERID" ] && [ "$USERID" -gt 0 ]) 2> /dev/null # i.e. if USERID is numeric and not root user
 		then
 			echo "  * found existing home dir with User ID $USERID";
 			USERID="-u $USERID";

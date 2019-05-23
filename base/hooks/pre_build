@@ -32,8 +32,9 @@ cp -a ../container/filesystem/* fs;
 cat <<EOF > fs/etc/motd
 ================================================================================
 
-                         Generic Ubuntu-based Linux Environment
-                         Image: $IMAGE_NAME
+                     Generic Ubuntu-based Linux Environment
+
+                      Image: $IMAGE_NAME
 
                 Container build date: $(date +"%F %T %z")
 
