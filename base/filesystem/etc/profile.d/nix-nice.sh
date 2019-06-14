@@ -123,6 +123,7 @@ ud() {
 # Include 3rd party exe and tab completion
 for myDIR in /opt/*
 do
+	[ -d "$myDIR" ] || continue;
 	[ "$PATH" = "${PATH#*$myDIR/bin*}" ] && export PATH="$myDIR/bin:$PATH";
 	for myFILE in "$myDIR"/*.completion
 	do

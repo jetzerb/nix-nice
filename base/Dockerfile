@@ -1,5 +1,5 @@
 # Base layer
-FROM ubuntu:18.10
+FROM ubuntu:19.04
 
 # Container attributes...
 LABEL about="Generic Ubuntu-based Linux environment"
@@ -122,14 +122,14 @@ mkdir -p /tmp/install; \
 # rg > ag > ack > grep
 cd /tmp/install; \
 URL=https://github.com/BurntSushi/ripgrep/releases; \
-wget $(wget -O - "$URL" |sed -n '/href=".*ripgrep.*amd64\.deb"/ {s!.*href="\([^"]*\)".*!https://github.com\1!; p;}' |head -1;); \
+wget $(lynx --dump $URL |grep "$URL.*download.*ripgrep.*amd64\.deb$" | sed -n '1{s/.*http/http/;p;}'); \
 dpkg -i ripgrep*.deb; \
 #
 # Install xsv (parse delimited files)
 cd /tmp/install; \
 mkdir -p /opt/xsv/bin; \
 URL=https://github.com/BurntSushi/xsv/releases; \
-wget $(wget -O - "$URL" |sed -n '/href=".*xsv.*x86.*64.*linux.*gz"/ {s!.*href="\([^"]*\)".*!https://github.com\1!; p;}' |head -1;); \
+wget $(lynx --dump $URL |grep "$URL.*download.*xsv.*x86.*64.*linux.*gz" | sed -n '1{s/.*http/http/;p;}'); \
 tar -xzf xsv*.gz; \
 mv xsv /opt/xsv/bin; \
 #
@@ -137,7 +137,7 @@ mv xsv /opt/xsv/bin; \
 cd /tmp/install; \
 mkdir -p /opt/trdsql/bin; \
 URL=https://github.com/noborus/trdsql/releases; \
-wget $(wget -O - "$URL" |sed -n '/href=".*trdsql.*linux.*64.*zip"/ {s!.*href="\([^"]*\)".*!https://github.com\1!; p;}' |head -1;); \
+wget $(lynx --dump $URL | grep "$URL.*trdsql.*linux.*64.*zip" | sed -n '1{s/.*http/http/;p;}'); \
 unzip -o trdsql*.zip; \
 cd trdsql*linux*; \
 mv trdsql /opt/trdsql/bin/; \
@@ -150,14 +150,14 @@ mv config.json.sample /etc/skel/.config/trdsql/config.json; \
 cd /tmp/install; \
 for CMD in bat fd hexyl; do \
 	URL=https://github.com/sharkdp/$CMD/releases; \
-	wget $(wget -O - "$URL" |sed -n '/musl/d; /href=".*'$CMD'.*amd64\.deb"/ {s!.*href="\([^"]*\)".*!https://github.com\1!; p;}' |head -1;); \
+	wget $(lynx --dump $URL |grep "$URL.*download.*${CMD}.*amd64\.deb$" | grep -v 'musl' | sed -n '1{s/.*http/http/;p;}'); \
 	dpkg -i ${CMD}*.deb; \
 done; \
 #
 # One can never have too many hex editors.
 cd /tmp/install; \
 URL=https://github.com/evanmiller/hecate/releases; \
-wget $(wget -O - "$URL" |sed -n '/href=".*hecate.*amd64\.deb"/ {s!.*href="\([^"]*\)".*!https://github.com\1!; p;}' |head -1;); \
+wget $(lynx --dump $URL |grep "$URL.*download.*hecate.*amd64\.deb$" | sed -n '1{s/.*http/http/;p;}'); \
 dpkg -i hecate*.deb; \
 #
 # Install perl extension to adjust urxvt font size on the fly
@@ -209,7 +209,7 @@ cp .tmux.conf.local /etc/skel; \
 cd /usr/share/fonts/truetype/dejavu/; \
 rm *Mono*; \
 URL=https://github.com/powerline/fonts/blob/master/DejaVuSansMono; \
-wget $(wget -O - "$URL" |sed -n '/href=".*Mono.*ttf"/ {s!.*href="\([^"]*\)".*!https://github.com\1!; s!/blob/!/raw/!; p;}'); \
+wget $(lynx --dump $URL |sed -n '/https.*Mono.*ttf/{s/.*https/https/; s!/blob/!/raw/!; s/ /%20/g; p;}'); \
 #
 # tldr bash client with colorful output
 cd /opt; \
