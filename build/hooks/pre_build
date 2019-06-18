@@ -1,0 +1,51 @@
+#!/bin/sh
+
+echo "I am [$0]";
+echo "Pre-Build Hook Start DateTime: $(date)";
+
+BANNER=$1; # to be embedded in the MOTD
+
+cat <<EOF
+SOURCE_BRANCH:   $SOURCE_BRANCH
+SOURCE_COMMIT:   $SOURCE_COMMIT
+COMMIT_MSG:      $COMMIT_MSG
+DOCKER_REPO:     $DOCKER_REPO
+DOCKERFILE_PATH: $DOCKERFILE_PATH
+CACHE_TAG:       $CACHE_TAG
+IMAGE_NAME:      $IMAGE_NAME
+
+SHELL:           $SHELL
+PWD:             $PWD
+. . .
+EOF
+
+
+# Make combined filesystem
+cp -a filesystem fs;
+cp -a ../container/filesystem/* fs;
+
+cat <<EOF > fs/etc/motd
+================================================================================
+
+$(echo -n "$BANNER" | pr -To $(( (80 - ${#X}) / 2 ));)
+
+                    Image: ${IMAGE_NAME#*/}
+
+                Container build date: $(date +"%F %T %z")
+
+================================================================================
+EOF
+
+
+# ensure *NIX line endings everywhere before copying into the image
+for FILE in $(find fs -type f)
+do
+	# Docker build server doesn't have dos2unix, do it the long way
+	tr -d '\r' <"$FILE" >tmp$$ && cp tmp$$ "$FILE" && rm tmp$$;
+
+	# ensure correct permissions on shell scripts
+	if [ "$(echo -n $FILE |tail -c 3)" = ".sh" ]
+	then
+		chmod 755 "$FILE";
+	fi;
+done;

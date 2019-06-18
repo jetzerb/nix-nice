@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# clean up after ourselves
+rm -rf fs;
+
+echo "Post-Build Hook End DateTime: $(date)";
