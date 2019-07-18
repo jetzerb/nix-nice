@@ -9,47 +9,67 @@
 # commandline editing using vi mode
 set -o vi;
 
+
+# Include 3rd party exe paths and tab completion
+for myDIR in /opt/* $HOME
+do
+	[ -d "$myDIR" ] || continue;
+	[ "$PATH" = "${PATH#*$myDIR/bin*}" ] && export PATH="$myDIR/bin:$PATH";
+	for myFILE in "$myDIR"/*.completion
+	do
+		[ -f "$myFILE" ] && . "$myFILE";
+	done;
+done;
+unset myDIR myFILE;
+
+
 # colorful directory listings
 eval "$(dircolors)";
-alias ls='ls -F --color=auto --show-control-chars';
+alias ls='/bin/ls -F --color=auto --show-control-chars';
 
 # other useful aliases
-alias  l='ls';            # saves 50%!
-alias ll='ls -l';         # long listing
-alias la='ls -lA';        # list dotfiles too
-alias lr='ls -lR';        # recursive long listing
-alias lR='ls -lAR';       # recursive long listing with dotfiles too
-alias l.='ls -ld .*';     # list only dotfiles
-alias cd..='cd ..';       # that spacebar can be tricky
-alias less='less -riNX';  # -r = raw control codes for colored text
-                          # -i = smart case search (case insensitive if all lowercase search terms)
-                          # -N = show line numbers
-                          # -X = don't clear screen on exit
-alias nocomment="grep -Ev '^[[:blank:]]*(#|$)'"; # show all non-comment lines from config files
+alias  l='ls';        # saves 50%!
+alias ll='ls -l';     # long listing
+alias la='ls -lA';    # list dotfiles too
+alias lr='ls -lR';    # recursive long listing
+alias lR='ls -lAR';   # recursive long listing with dotfiles too
+alias l.='ls -ld .*'; # list only dotfiles
+alias cd..='cd ..';   # that spacebar can be tricky
+alias nocomment="/bin/grep -Ev '^[[:blank:]]*(#|$)'"; # show all non-comment lines from config files
 alias nocmt=nocomment;
+alias less='/usr/bin/less -iKMNQRWX';
+                      # -i = smart case search (case insensitive if all lowercase search terms)
+                      # -K = quit in response to CTRL-C
+                      # -M = long prompt (shows line numbers & percentage)
+                      # -N = show line numbers
+                      # -Q = quiet the terminal bell
+                      # -R = raw control codes for colored text
+                      # -W = highlight first new line after forward movement
+                      # -X = don't clear screen on exit
 
-# use the most fully-featured vi available
-for myVI in nvim vim vis elvis xvi nvi
-do
-	myEXE="$(which $myVI)";
-	if [ -n "$myEXE" ]
-	then
-		export VISUAL="$myEXE";
-		export EDITOR="$myEXE";
-		alias vi="$myEXE";
-		# less.sh is like less but with color syntax
-		myLESS=/usr/share/$myVI/runtime/macros/less.sh;
-		[ -f $myLESS ] && alias lesss=$myLESS;
-		break;
-	fi;
-done;
-unset myVI myEXE myLESS;
+# I like vi
+myCMD="$(which vi)";
+if [ -n "$myCMD" ]
+then
+	export VISUAL="$myCMD";
+	export EDITOR="$myCMD";
+	# less.sh is like less but with color syntax
+	myCMD=/usr/share/$myVI/runtime/macros/less.sh;
+	[ -f $myCMD ] && alias lesss=$myCMD;
+fi;
+unset myCMD;
 
 
 # nobody likes to type ".sh"
-for myCMD in $(find /opt/*/bin /usr/local/bin -type f -name '*.sh')
+echo $PATH | sed 's/:/\n/g;' |
+while read myDIR
 do
-	alias $(basename ${myCMD%.sh})=$myCMD;
+	cd "$myDIR";
+	/bin/ls -1f *.sh 2>/dev/null |
+	while read myCMD
+	do
+		alias ${myCMD%.sh}=$myDIR/$myCMD;
+	done;
 done;
 unset myCMD;
 
@@ -118,19 +138,6 @@ ud() {
 	[ -n "$SUB" ] && [ ${SUB:1:1} != / ] && SUB=/$SUB;
 	cd "$TGT"$STAR"$SUB";
 }
-
-
-# Include 3rd party exe and tab completion
-for myDIR in /opt/*
-do
-	[ -d "$myDIR" ] || continue;
-	[ "$PATH" = "${PATH#*$myDIR/bin*}" ] && export PATH="$myDIR/bin:$PATH";
-	for myFILE in "$myDIR"/*.completion
-	do
-		[ -f "$myFILE" ] && . "$myFILE";
-	done;
-done;
-unset myDIR myFILE;
 
 
 # If you don't set your language, tmux will not print unicode characters properly

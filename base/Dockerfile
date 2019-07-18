@@ -3,7 +3,7 @@ FROM ubuntu:19.04
 
 # Container attributes...
 LABEL about="Generic Ubuntu-based Linux environment"
-LABEL features="meld, neovim, ripgrep, tmux, trdsql, xsv, bat, fd, fzf, ddgr, tldr"
+LABEL features="meld, neovim, ripgrep, tmux, trdsql, xsv, bat, fd, fzf, ddgr, tldr, others"
 LABEL access="SSH, key authentication, X11 forwarding"
 LABEL maintainer="jetzerb@sva.com"
 
@@ -31,6 +31,7 @@ apt-get -yq install --no-install-recommends \
 apt-get -yq install --no-install-recommends \
 #
 # system level packages
+	software-properties-common $(: so we can add ppa repositories ) \
 	locales               $(: so we speak the right language) \
 	openssh-server        $(: so we can connect to our container via SSH) \
 	xauth                 $(: facilitates X11 forwarding in SSH) \
@@ -39,7 +40,8 @@ apt-get -yq install --no-install-recommends \
 	rsync                 $(: so we can sync between Linux and Windows filesystems) \
 	dbus-x11              $(: so apps like Meld can persist their preferences) \
 	at-spi2-core          $(: prevent "Error retrieving accessibility bus" warnings in gtk apps) \
-	xclip                 $(: clipboard manager for X) \
+	yank                  $(: terminal clipboard manager...also installs xsel) \
+	xclip                 $(: clipboard utility, for those who prefer it to xsel) \
 #
 # basic operating environment
 	busybox               $(: lots of utilities in one binary) \
@@ -63,6 +65,7 @@ apt-get -yq install --no-install-recommends \
 	wget                  $(: download files from the internet) \
 	curl                  $(: download files from the internet) \
 	meld                  $(: visual merge/diff tool) \
+	ministat              $(: statistics tool) \
 #
 # productivity
 	ddgr                  $(: duck duck go from the CLI) \
@@ -74,6 +77,11 @@ apt-get -yq install --no-install-recommends \
 	fonts-dejavu          $(: nice looking unicode terminal font) \
 #       powerline patched dejavu fonts added below
 ; \
+#
+# Add repository containing "bitwise" and then install it
+add-apt-repository ppa:ramon-fried/bitwise; \
+apt-get -yq install --no-install-recommends \
+	bitwise; \
 #
 # remove package lists to trim > 20MB of cruft
 rm -rf /var/lib/apt/lists/*;
@@ -146,6 +154,7 @@ mkdir -p /etc/skel/.config/trdsql; \
 mv config.json.sample /etc/skel/.config/trdsql/config.json; \
 #
 # Install bat (pager w/syntax highlighting and git integration; can be used as replacement for cat)
+# Install fd (file finder)
 # Install hexyl (colorized hex dump utility)
 cd /tmp/install; \
 for CMD in bat fd hexyl; do \
@@ -153,6 +162,11 @@ for CMD in bat fd hexyl; do \
 	wget $(lynx --dump $URL |grep "$URL.*download.*${CMD}.*amd64\.deb$" | grep -v 'musl' | sed -n '1{s/.*http/http/;p;}'); \
 	dpkg -i ${CMD}*.deb; \
 done; \
+TGT=/etc/skel/.config/bat; \
+mkdir -p $TGT; \
+TGT=$TGT/config; \
+echo "# Options for bat (https://github.com/sharkdp/bat)" > $TGT; \
+echo -e "\n--pager='/usr/bin/less -iKMQRWX'"; >> $TGT; \
 #
 # One can never have too many hex editors.
 cd /tmp/install; \
@@ -171,11 +185,11 @@ mkdir -p /etc/skel/.urxvt/ext/; \
 mv font-size /etc/skel/.urxvt/ext/; \
 #
 # Install "The Ultimate Vim Configuration"
-cd /etc/profile.d; \
+cd /tmp/install; \
 wget https://github.com/amix/vimrc/archive/master.zip; \
-unzip master.zip; \
+unzip -o master.zip; \
 rm master.zip; \
-mv vimrc-master vim_runtime; \
+mv vimrc-master /etc/profile.d/vim_runtime; \
 mkdir -p /etc/skel/.config/nvim; \
 cd /etc/skel/.config/nvim; \
 /etc/profile.d/vim_runtime/install_awesome_parameterized.sh /etc/profile.d/vim_runtime root; \
