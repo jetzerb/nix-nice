@@ -6,7 +6,8 @@
 # to facilitate building the container image locally.
 
 # get version info based on tag attached to HEAD commit
-VER=$(git log -1 --format='%D' |sed -n '/tag:/{s/.*tag: *//; s/ .*//; s/,.*//; p;}');
+CUR=${PWD##*/};
+VER=$(git log -1 --format='%D' |sed 's/, */\n/g;' |sed -n "/^tag: $CUR/ {s/^tag: //; p;}");
 
 if [ -z "$VER" ]
 then
@@ -20,7 +21,7 @@ export SOURCE_COMMIT=$(git log -1 --format='%H');
 export COMMIT_MSG=$(git log -1 --format='%s');
 export DOCKER_REPO='jetzerb/nix-nice';
 export DOCKERFILE_PATH=$PWD;
-export CACHE_TAG="${PWD##*/}-$VER";
+export CACHE_TAG=$VER;
 export IMAGE_NAME="$DOCKER_REPO:$CACHE_TAG";
 
 echo "Building Image $IMAGE_NAME";

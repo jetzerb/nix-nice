@@ -166,7 +166,7 @@ TGT=/etc/skel/.config/bat; \
 mkdir -p $TGT; \
 TGT=$TGT/config; \
 echo "# Options for bat (https://github.com/sharkdp/bat)" > $TGT; \
-echo -e "\n--pager='/usr/bin/less -iKMQRWX'"; >> $TGT; \
+echo -e "\n--pager='/usr/bin/less -iKMQRWX'" >> $TGT; \
 #
 # One can never have too many hex editors.
 cd /tmp/install; \
@@ -197,11 +197,15 @@ mv ~/.vimrc ./init.vim; \
 sed -i 's![^ \]*\(/my_configs\)!~/.config/nvim\1!;' init.vim; \
 # until git is installed, move some of the awesomeness out of the way
 cd /etc/profile.d/vim_runtime; \
+echo ">>>> Just about to do the for loop"; \
+rg -il -g '*.vim' 'git.executable'  |sed 's!\([^/]*/[^/]*\)/.*!    >>>> \1!;' |sort -u; \
 for FILE in $(rg -il -g '*.vim' 'git.executable'  |sed 's!\([^/]*/[^/]*\)/.*!\1!;' |sort -u); \
 do \
+	echo "    >>>> Moving file $FILE to zz${FILE%/*}"; \
 	mkdir -p zz${FILE%/*}; \
 	mv $FILE zz${FILE%/*}; \
 done; \
+ls -1 |sed 's/^/    >>ls /'; \
 #
 # Install "pretty and versatile" tmux configuration
 cd /tmp/install; \

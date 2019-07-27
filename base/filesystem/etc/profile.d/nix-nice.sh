@@ -14,7 +14,7 @@ set -o vi;
 for myDIR in /opt/* $HOME
 do
 	[ -d "$myDIR" ] || continue;
-	[ "$PATH" = "${PATH#*$myDIR/bin*}" ] && export PATH="$myDIR/bin:$PATH";
+	[ -d "$myDIR/bin" ] && [ "$PATH" = "${PATH#*$myDIR/bin*}" ] && export PATH="$myDIR/bin:$PATH";
 	for myFILE in "$myDIR"/*.completion
 	do
 		[ -f "$myFILE" ] && . "$myFILE";
