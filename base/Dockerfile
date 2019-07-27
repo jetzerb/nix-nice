@@ -198,7 +198,7 @@ sed -i 's![^ \]*\(/my_configs\)!~/.config/nvim\1!;' init.vim; \
 # until git is installed, move some of the awesomeness out of the way
 cd /etc/profile.d/vim_runtime; \
 echo ">>>> Just about to do the for loop"; \
-rg -il -g '*.vim' 'git.executable'  |sed 's!\([^/]*/[^/]*\)/.*!    >>>> \1!;' |sort -u; \
+rg --debug -il -g '*.vim' 'git.executable'  |sed 's!\([^/]*/[^/]*\)/.*!    >>>> \1!;' |sort -u; \
 for FILE in $(rg -il -g '*.vim' 'git.executable'  |sed 's!\([^/]*/[^/]*\)/.*!\1!;' |sort -u); \
 do \
 	echo "    >>>> Moving file $FILE to zz${FILE%/*}"; \
