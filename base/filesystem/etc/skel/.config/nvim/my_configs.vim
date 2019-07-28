@@ -1,6 +1,8 @@
 "
 " neovim configuration
 
+" tell nvim that we have a dark background, so it won't print dark blue on black
+set background=dark
 
 " Show whitespace
 set showbreak=#\
@@ -17,3 +19,10 @@ set tabstop=8
 
 " I also like to see line numbers while I'm editing
 set number
+
+" case insensitive searches unless mixed case search expression
+set ignorecase
+set smartcase
+
+" if we don't highlight the current line, neovim under SmarTTY behaves badly
+set cursorline

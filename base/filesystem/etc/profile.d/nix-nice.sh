@@ -111,9 +111,10 @@ ud() {
 			esac;;
 		$)
 			case "$PWD" in
-				$HOME/hosthome/*) TGT=${PWD/\/hosthome/};;
-				$HOME*)           TGT=${PWD/$HOME/$HOME\/hosthome};;
-				*)                TGT=$PWD;;
+				$HOME/hosthome | $HOME/hosthome/*)
+				        TGT=${PWD/\/hosthome/};;
+				$HOME*) TGT=${PWD/$HOME/$HOME\/hosthome};;
+				*)      TGT=$PWD;;
 			esac;;
 		([0-9] | [0-9][0-9]) # move up "n" dirs
 			TGT=$PWD;
