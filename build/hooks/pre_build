@@ -27,7 +27,7 @@ cp -a ../container/filesystem/* fs;
 cat <<EOF > fs/etc/motd
 ================================================================================
 
-$(echo -n "$BANNER" | pr -To $(( (80 - ${#X}) / 2 ));)
+$(echo -n "$BANNER" | pr -To $(( (80 - ${#BANNER}) / 2 ));)
 
                     Image: ${IMAGE_NAME#*/}
 

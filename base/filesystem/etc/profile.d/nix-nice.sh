@@ -53,25 +53,30 @@ if [ -n "$myCMD" ]
 then
 	export VISUAL="$myCMD";
 	export EDITOR="$myCMD";
+fi;
+myCMD=$(realpath $myCMD);
+if [ -n "$myCMD" ]
+then
+	myCMD=$(basename $myCMD);
 	# less.sh is like less but with color syntax
-	myCMD=/usr/share/$myVI/runtime/macros/less.sh;
+	myCMD=/usr/share/$myCMD/runtime/macros/less.sh;
 	[ -f $myCMD ] && alias lesss=$myCMD;
 fi;
 unset myCMD;
 
 
 # nobody likes to type ".sh"
-echo $PATH | sed 's/:/\n/g;' |
-while read myDIR
+pushd . >/dev/null;
+for myDIR in $(echo $PATH | sed 's/:/\n/g;')
 do
 	cd "$myDIR";
-	/bin/ls -1f *.sh 2>/dev/null |
-	while read myCMD
+	for myCMD in $(/bin/ls -1f *.sh 2>/dev/null)
 	do
 		alias ${myCMD%.sh}=$myDIR/$myCMD;
 	done;
 done;
-unset myCMD;
+unset myDIR myCMD;
+popd >/dev/null;
 
 #
 # cd up a few directories
