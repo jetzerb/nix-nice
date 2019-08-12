@@ -66,6 +66,9 @@ apt-get -yq install --no-install-recommends \
 	curl                  $(: download files from the internet) \
 	meld                  $(: visual merge/diff tool) \
 	ministat              $(: statistics tool) \
+	imagemagick           $(: view and modify images) \
+	gnuplot-nox           $(: no-X version of gnuplot so we install 3MB instead of 300) \
+	poppler-utils         $(: pdf utils to extract text and images, concatenate and split, etc) \
 #
 # productivity
 	ddgr                  $(: duck duck go from the CLI) \
@@ -75,6 +78,7 @@ apt-get -yq install --no-install-recommends \
 # graphical apps
 	rxvt-unicode          $(: for running a terminal on a local X server) \
 	fonts-dejavu          $(: nice looking unicode terminal font) \
+	xpdf                  $(: lightest weight pdf viewer around) \
 #       powerline patched dejavu fonts added below
 ; \
 #
