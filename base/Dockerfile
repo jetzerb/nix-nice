@@ -271,6 +271,13 @@ cd /etc; \
 echo set completion-ignore-case on >> inputrc; \
 #
 #
+# set theme back to Adwaita since Yaru is so bloated
+sed -i -e '/^gtk-theme/      {s/Yaru/Ambiance/;}' \
+       -e '/^gtk-icon-theme/ {s/Yaru/ubuntu-mono-dark/;}' \
+       -e '/^gtk-sound/      {s/Yaru/ubuntu/;}' \
+	/etc/gtk-3.0/settings.ini; \
+#
+#
 echo "Done with major installation and configuration";
 #
 # SOFTWARE INSTALL END
