@@ -147,7 +147,10 @@ ud() {
 
 
 # If you don't set your language, tmux will not print unicode characters properly
-export LANG=en_US.UTF-8
+export LANG=en_US.UTF-8;
+
+# Ensure browser set (or ddgr will not work properly)
+export BROWSER=www-browser;
 
 # ---------
 # Set up fzf (fuzzy finder)
