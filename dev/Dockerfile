@@ -24,6 +24,9 @@ apt-get -yq install --no-install-recommends \
 	git                  $(: source control manager) \
 	git-lfs              $(: git add-on for handling BLOBs) \
 #
+# the go-to db engine
+	sqlite3              $(: small, fast, SQL db engine, most-used in the world) \
+#
 # VS Code pre-requisites
 	libnotify4 \
 	libxkbfile1 \
