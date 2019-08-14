@@ -71,7 +71,7 @@ tar zxf /tmp/install/linux64; \
 cd Postman; \
 mkdir bin; \
 cd bin; \
-ln -s ../app/Postman .; \
+ln -s ../app/Postman postman; \
 rm /tmp/install/linux64; \
 #
 #
@@ -97,7 +97,7 @@ rm -rf /tmp/install; \
 #
 # system-wide settings for git
 # Settings for diff-so-fancy:
-git config --system core.pager "diff-so-fancy | less --tabs=4 -RFX --pattern '^(Date|added|deleted|modified): '"; \
+git config --system core.pager "diff-so-fancy | less"; \
 git config --system color.ui true; \
 #
 git config --system color.diff-highlight.oldNormal    "red bold"; \
