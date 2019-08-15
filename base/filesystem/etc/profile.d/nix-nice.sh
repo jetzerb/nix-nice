@@ -47,6 +47,24 @@ alias less='/usr/bin/less -iKMNQRWX';
                       # -W = highlight first new line after forward movement
                       # -X = don't clear screen on exit
 
+# Per PEP 394, there is ambiguity in whether the "python" command should point
+# to python2 or python3.  If we don't have a "python" command, make an alias.
+# To prevent old programs from breaking, set to python2 if that's installed,
+# otherwise python3
+if ! type python >/dev/null 2>&1
+then
+	for myCMD in 2 3
+	do
+		myCMD=/usr/bin/python$myCMD
+		if [ -x $myCMD ]
+		then
+			alias python=$myCMD;
+			break;
+		fi;
+	done;
+fi;
+unset myCMD;
+
 # I like vi
 myCMD="$(which vi)";
 if [ -n "$myCMD" ]
