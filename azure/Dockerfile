@@ -21,7 +21,7 @@ az extension add --name azure-devops; \
 #
 #
 # remove package lists to trim > 20MB of cruft
-rm -rf /var/lib/apt/lists/*;
+rm -rf /var/lib/apt/lists/*; \
 #
 #
 #
