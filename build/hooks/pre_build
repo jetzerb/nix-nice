@@ -21,20 +21,24 @@ EOF
 
 
 # Make combined filesystem
-cp -a filesystem fs;
+[ -d filesystem ] && cp -a filesystem fs;
 cp -a ../container/filesystem/* fs;
 
-cat <<EOF > fs/etc/motd
-================================================================================
+mkdir -p fs/etc; # ensure that /etc exists so we can add the MOTD
 
-$(echo -n "$BANNER" | pr -To $(( (80 - ${#BANNER}) / 2 ));)
-
-                    Image: ${IMAGE_NAME#*/}
-
-                Container build date: $(date +"%F %T %z")
-
-================================================================================
-EOF
+HR=$(printf '%80s' | sed 's/ /=/g;');
+for LINE in \
+	"$HR" \
+	"$BANNER" \
+	"Image: ${IMAGE_NAME#*/}" \
+	"Container build date: $(date +'%F %T %z')" \
+	"Welcome, my son!  Welcome to the machine!" \
+	"$HR"
+do
+	# center each line
+	echo $LINE | pr -To $(( (80 - ${#LINE}) / 2 ));
+	echo;
+done | head -n -1 > fs/etc/motd;
 
 
 # ensure *NIX line endings everywhere before copying into the image

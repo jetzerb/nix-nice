@@ -7,7 +7,7 @@
 
 # get version info based on tag attached to HEAD commit
 CUR=${PWD##*/};
-VER=$(git log -1 --format='%D' |sed 's/, */\n/g;' |sed -n "/^tag: $CUR/ {s/^tag: //; p;}");
+VER=$(git log -1 --format='%D' |sed 's/, */\n/g;' |sed -n "/^tag: $CUR/ {s/^tag: //; p;}" |sort |head -1);
 
 if [ -z "$VER" ]
 then
