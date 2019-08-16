@@ -3,7 +3,7 @@ FROM jetzerb/nix-nice:dev-latest
 
 # Container attributes...
 LABEL about="Ubuntu-Based Linux Environment for Azure DevOps users"
-LABEL features="nix-nice dev, plus azure CLI with DevOps extension"
+LABEL features="nix-nice dev, plus azure CLI with DevOps extension, and Azure Data Studio"
 LABEL access="SSH, key authentication, X11 forwarding"
 LABEL maintainer="jetzerb@sva.com"
 

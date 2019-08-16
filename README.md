@@ -13,14 +13,17 @@ The primary motivators for this project are to
   2018, so that WSL is not nearly as slow as it used to be, but still
   pretty inconvenient.
 
+
 ## Layout
 In order to appeal to a wide audience, there are multiple layers of
 files
 - base layer applicable to any linux user comfortable with the commandline
 - layer for developers (git, [VS Code](https://code.visualstudio.com/),
   [DBeaver](https://dbeaver.io/))
-- layer for MS-centric developers ([VSTS
-  CLI](https://docs.microsoft.com/en-us/cli/vsts/overview?view=vsts-cli-latest))
+- layer for MS-centric developers ([Azure CLI]
+  (https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
+  and [Azure Data Studio]
+  (https://docs.microsoft.com/en-us/sql/azure-data-studio/download?view=sql-server-2017))
 
 ## Docker Container
 If you configure your Windows >= 10 or Server >= 2016 to use Docker,
@@ -68,7 +71,7 @@ docker volume create userdata
 ```
 
 #### Start the Container
-See `container_start*` files in the `container` folder of the
+See `container-start*` files in the `container` folder of the
 [nix-nice](https://github.com/jetzerb/nix-nice) git repo.  On windows,
 you'd issue a command like this:
 ```dos
@@ -126,14 +129,14 @@ since it comes bundled with an X server.
   For now, just use Personal Access Tokens.  The default git config file
   will cache the credentials for 10 hours, so you should only need to
   enter your name & token once per day.
-- The original image is based on Alpine Linux because the resulting container
+- The original image was based on Alpine Linux because the resulting container
   image builds faster and is much smaller than the corresponding Ubuntu-based
   image.  However, Alpine is based on the [musl](https://www.musl-libc.org/)
   c library, rather than [glibc](https://www.gnu.org/software/libc/).
   Electron (the framework upon which Atom, VS Code, SQL Ops Studio, and
   other cool toys are built) [doesn't work with
   musl](https://github.com/electron/electron/issues/9662).
-  I'm switching to Ubuntu for now.  It also has more packages that I'm
+  I switched to Ubuntu.  It also has more packages that I'm
   interested in, so the Dockerfiles tend to be more straight-forward.
 
 ### TODO
@@ -143,11 +146,11 @@ since it comes bundled with an X server.
   Somehow the "id" command knows about all the users in my organization,
   and spits out a unique 7 digit number for each person.  We all seem to
   share the same group id.  It's tied to Active Directory somehow, but I
-  don't know exactly how.  And when I run ```whoami -all``` from a
+  don't know exactly how.  And when I run `whoami -all` from a
   powershell window, it dumps out an awful lot of information, but the
   UID and GID that Git Bash reports are nowhere to be found.
-  Running ```strace id``` shows references to
-  ```pwdgrp::fetch_account_from_windows```. This isn't important for
+  Running `strace id` shows references to
+  `pwdgrp::fetch_account_from_windows`. This isn't important for
   individual use of the container, but if the container is shared on a
   terminal server, it's important to keep everyone's user IDs consistent.
   MS claims to be working on AD authentication for Linux containers
@@ -156,8 +159,10 @@ since it comes bundled with an X server.
   thus far nothing has come of it.
   - [#262](https://github.com/Microsoft/mssql-docker/issues/262)
   - [#273](https://github.com/Microsoft/mssql-docker/issues/273)
-- VS Code is quite sluggish using X forwarding.  Couldn't get x2go Windows
-  client work.  There is much better performance when coding in a browser
-  via [code-server](https://github.com/cdr/code-server).
+- Graphical apps are quite sluggish using X forwarding on Windows.  Couldn't
+  get x2go Windows client work.  There is much better performance when
+  coding in a browser via [code-server](https://github.com/cdr/code-server).
+  This seems to be much less of an issue on Linux.  Perhaps X Servers on
+  Windows are just slow?
 - Allow LCOW?  Currently, the `--mount` syntax doesn't work.  I'm sure
   there are other issues as well.
