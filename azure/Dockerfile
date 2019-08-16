@@ -24,7 +24,7 @@ apt-get -yq install --no-install-recommends \
 	libxss1 \
 	libgconf-2-4 \
 	libunwind8 \
-; \
+;
 
 
 #
