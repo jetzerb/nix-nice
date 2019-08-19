@@ -20,10 +20,11 @@ EOF
 #
 #
 
-case $1 in
+case ${1:-} in
 	-? | -h | --help)
 		usage;
 		exit 0 ;;
+	"") ;; # fall through to code below
 	*)
 		usage;
 		exit 1;;
@@ -47,9 +48,10 @@ do
 	# if branch contains the string ": gone]", it should be deleted from the local repository
 	if [ "${BRANCH#*: gone]}" != "$BRANCH" ]
 	then
-		BRANCH=${BRANCH#\* }; # strip off leading "* " if this is the current branch
-		BRANCH=${BRANCH%% *}; # strip off everything after the first space
-		echo "    $BRANCH";
+		# Strip off leading "*" (appears on current branch), and any leading spaces.
+		# Then everything after the first space (i.e. get branch name only)
+		BRANCH=$(echo $BRANCH | sed 's/^[\* ]*//; s/ .*//;');
+		echo "Deleting branch '$BRANCH'";
 		git branch -d $BRANCH;
 	fi;
 done;

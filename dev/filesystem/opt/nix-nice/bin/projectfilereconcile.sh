@@ -52,7 +52,7 @@ EOF
 REPODIR=$(git rev-parse --show-toplevel);
 cd "$REPODIR";
 echo "Checking Project Files Under $REPODIR";
-dirname $(find . -iname '*.*proj') |
+dirname $(find . -iname '*.*proj') 2>/dev/null |
 sort -u |
 while read -r DIR
 do
