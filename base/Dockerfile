@@ -145,6 +145,15 @@ wget $(lynx --dump $URL |grep "$URL.*download.*xsv.*x86.*64.*linux.*gz" | sed -n
 tar -xzf xsv*.gz; \
 mv xsv /opt/xsv/bin; \
 #
+# Install gron (makes JSON greppable)
+TGT=/opt/gron/bin; \
+mkdir -p $TGT; \
+cd $TGT; \
+URL=https://github.com/tomnomnom/gron/releases; \
+wget $(lynx --dump $URL |grep "$URL.*gron-linux-amd64.*tgz" | sed -n '1{s/.*http/http/;p;}'); \
+tar -xzf gron*tgz; \
+rm gron*gz; \
+#
 # Install trdsql (parse a variety of file types using SQL)
 cd /tmp/install; \
 mkdir -p /opt/trdsql/bin; \
