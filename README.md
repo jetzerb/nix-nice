@@ -20,10 +20,8 @@ files
 - base layer applicable to any linux user comfortable with the commandline
 - layer for developers (git, [VS Code](https://code.visualstudio.com/),
   [DBeaver](https://dbeaver.io/))
-- layer for MS-centric developers ([Azure CLI]
-  (https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
-  and [Azure Data Studio]
-  (https://docs.microsoft.com/en-us/sql/azure-data-studio/download?view=sql-server-2017))
+- layer for MS-centric developers ([Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
+  and [Azure Data Studio](https://docs.microsoft.com/en-us/sql/azure-data-studio/download?view=sql-server-2017))
 
 ## Docker Container
 If you configure your Windows >= 10 or Server >= 2016 to use Docker,

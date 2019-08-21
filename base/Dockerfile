@@ -42,6 +42,7 @@ apt-get -yq install --no-install-recommends \
 	at-spi2-core          $(: prevent "Error retrieving accessibility bus" warnings in gtk apps) \
 	yank                  $(: terminal clipboard manager...also installs xsel) \
 	xclip                 $(: clipboard utility, for those who prefer it to xsel) \
+	httping               $(: ping for http and https) \
 #
 # basic operating environment
 	busybox               $(: lots of utilities in one binary) \
