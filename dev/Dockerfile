@@ -148,10 +148,4 @@ echo "Done with major installation and configuration";
 COPY fs/ /
 
 #
-# Expose the standard SSH port
-#EXPOSE 22
-
-# entry point creates users inside the container, based on the users
-# present in the /hosthome bind mount
-#ENTRYPOINT ["/opt/nix-nice/sbin/container-startup.sh"]
-#CMD ["-epus"]
+# Inherit exposed ports, entry point, and command from base container

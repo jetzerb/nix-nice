@@ -14,19 +14,24 @@ case "$URL" in
 	*)
 		echo '[{"name": "<Unknown Source Control Provider>"}]';;
 esac |
-jq '.[] .name' |
-sed 's/^"\(.*\)"$/\1/' |
-sort -f |
+jq -r 'sort_by(.name) | .[] .name' |
 while read REPO
 do
 	echo -e "\n-------> $REPO";
-	if [ ! -d "$REPO" ]
+	DIR=$(urlencode.sh $REPO);
+	if [ ! -d "$DIR" ]
 	then
 		echo "Cloning $REPO";
 		clone.sh "$REPO";
 	fi;
-	cd "$REPO";
-	(git checkout develop || git checkout master ) && git pull \
-		|| echo "!!!! Branchless Repo !!!!";
+	cd "$DIR";
+	MAIN=$(git branch -r | sed -n '/HEAD/ {s!.*/!!; p;}');
+	if [ -z "$MAIN" ]
+	then
+		echo "!!!! No Remote Branches !!!!";
+	else
+		git checkout $MAIN || true;
+		git pull || true;
+	fi;
 	cd ..;
 done;
