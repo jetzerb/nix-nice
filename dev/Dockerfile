@@ -39,6 +39,9 @@ apt-get -yq install --no-install-recommends \
 #
 # DBeaver pre-requisites
 	default-jre-headless \
+#
+# OSquery pre-requisites
+	libc++1 \
 ; \
 #
 # remove package lists to trim > 20MB of cruft
@@ -64,6 +67,13 @@ cd /tmp/install; \
 wget https://dbeaver.io/files/dbeaver-ce_latest_amd64.deb; \
 dpkg -i dbeaver*.deb; \
 rm dbeaver*.deb; \
+#
+#
+# OSQuery: query your system using SQL
+ce /tmp/install; \
+URL=https://github.com/osquery/osquery/releases; \
+wget -O osquery.deb $(lynx --dump $URL | sed -n '/[0-9][0-9]*\. https.*deb/ {s/.*https/https/; p;}'); \
+dpkg -i osquery.deb; \
 #
 #
 # Postman: API Development Environment

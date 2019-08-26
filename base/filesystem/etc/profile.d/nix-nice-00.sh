@@ -100,8 +100,11 @@ popd >/dev/null;
 # cd up a few directories
 #   blank = toplevel of current git repo, or home dir if not in a git repo
 #       ^ = same as above
-#      ^^ = out of repo
-#      ^^ = out of repo's parent dir
+#      ^^ = out of repo, to project/user dir
+#     ^^^ = out of project/user dir to source control provider dir
+#    ^^^^ = out of source control provider dir to code/review dir
+#   ^^^^^ = out of code/review dir to parent source dir
+#  ^^^^^^ = out of parent source dir to whatever is above that
 #       % = current folder, but toggle between "Code" and "Review" dirs/workspaces
 #       $ = current folder, but toggle between container & hosthome
 #       n = up "n" levels where n is an integer
@@ -112,7 +115,7 @@ popd >/dev/null;
 ud() {
 	local TGT I STAR SUB;
 	case "$1" in
-		("" | ^ | ^^ | ^^^)
+		("" | ^ | ^^ | ^^^ | ^^^^ | ^^^^^ | ^^^^^^)
 			# up to top of repo
 			TGT=$(git rev-parse --show-toplevel 2> /dev/null);
 			TGT=${TGT:-$HOME}; # or home dir if not in a repo
