@@ -1,0 +1,5 @@
+bin
+obj
+*.jfm
+*.dbmdl
+.vs

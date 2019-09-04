@@ -41,9 +41,9 @@ then
 	meld "$SRC" "$TGT";
 else
 	EXCLUDES="";
-	for FILE in ~/.rsync*excl*
+	for FILE in ~/.config/rsync/*exclu*
 	do
-		EXCLUDES="$EXCLUDES --exclude-from=\"$FILE\"";
+		[-f "$FILE"] && EXCLUDES="$EXCLUDES --exclude-from=\"$FILE\"";
 	done;
 	rsync -av --del \
 	      $EXCLUDES \
