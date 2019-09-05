@@ -75,6 +75,7 @@ apt-get -yq install --no-install-recommends \
 	ddgr                  $(: duck duck go from the CLI) \
 	nnn                   $(: CLI file manager) \
 	lynx                  $(: terminal-based web browser) \
+	sc                    $(: text-base spreadsheet) \
 #
 # graphical apps
 	rxvt-unicode          $(: for running a terminal on a local X server) \
