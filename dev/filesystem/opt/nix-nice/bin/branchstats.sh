@@ -14,7 +14,9 @@ Usage: $0 [-c compareBranch] [-b branchName] [-o format] [-d delim]
           [-h] [-B] [-v]
 
     -c compareBranch: specify the "compare to" branch (e.g. master);
-       defaults to the repo's default branch if not specified
+       if not specified, show stats for the entirety of branchName.
+       use "default" to use the repo's default branch (i.e. the one
+       listed as "HEAD" at the origin)
 
     -b branch: specify the branch for which stats are desired;
        defaults to current branch if not specified
@@ -28,13 +30,18 @@ Usage: $0 [-c compareBranch] [-b branchName] [-o format] [-d delim]
     -h include headers in the output;
        defaults to no headers if not specified
 
-    -B include branch name in the output
+    -B include branch names in the output
 
     -v verbose output (sent to STDERR so as to not disturb the actual output)
 }
 EOF
 	exit 1;
 }
+
+# Use ASCII Unit Separator internally as delimiter since no one else in the
+# world seems to. That will avoid "field contains the delimiter" issues.
+d=$(printf "\x1f");
+
 
 # Process commandline arguments
 while getopts ":c:b:o:d:hBv" opt
@@ -43,23 +50,34 @@ do
 		c) baseBranch=$OPTARG;;
 		b) branch=$OPTARG;;
 		o) outFmt="-o$OPTARG";;
-		d) delim="-od '$OPTARG'";;
+		d) delim="-od=$OPTARG";;
 		h) header="-oh";;
-		B) prefix="'branch' as Branch";;
+		B) prefix="'BRANCH' as Branch, 'BASE' as BaseBranch,";;
 		v) verbose=1;;
 		*) usage "$@"; exit 1;;
 	esac;
 done;
 
 # set default values if not specified by the caller
-baseBranch=${baseBranch:-$(git branch -r | sed -n '/HEAD/ {s!.*/!!; p;}')};
-branch=${branch:-HEAD};
+
+baseBranch=${baseBranch:-default};
+if [ "$(echo $baseBranch |tr 'A-Z' 'a-z')" = "default" ]
+then
+	baseBranch=$(git branch -r | sed -n '/HEAD/ {s!.*/!!; p;}');
+fi;
+
+branch=${branch:-$(git rev-parse --abbrev-ref HEAD)};
 outFmt=${outFmt:-};
 delim=${delim:-};
 header=${header:-};
 prefix=${prefix:-};
-[ -n "$prefix" ] && prefix="${prefix/branch/$branch},";
+if [ -n "$prefix" ]
+then
+	prefix="${prefix/BRANCH/$branch}";
+	prefix="${prefix/BASE/$baseBranch}";
+fi;
 verbose=${verbose:-};
+
 
 [ -n "$verbose" ] && cat <<EOF >&2
 Gathering stats on commits in branch
@@ -73,15 +91,11 @@ with these output options:
 - Include Branch: ${prefix:-No}
 EOF
 
-
 # Get the stats from the branch
 # NOTE: if branch is fully committed, there will be no git log entries
-# and no output at all, so manufacture some data to ensure we always
-# output *something*
-hdr=(Author CommitCnt FirstCommitDt LastCommitDt FileModCnt InsertCnt DeleteCnt);
-d=$(printf "\x1f"); # our delimiter = ASCII unit separator
+# and no output at all, other than a head if it was requested
 stats=$(
-git log --format=">>${d}%ai${d}%an${d}" --shortstat "$baseBranch".."$branch" \
+git log --format=">>${d}%ai${d}%an${d}" --shortstat --no-merges "$baseBranch".."$branch" \
 | awk -F $d -v OFS=$d '
 # commit line
 $1 == ">>" {
@@ -101,7 +115,7 @@ $1 == ">>" {
 }
 
 # short stat line
-/^ [1-9]/ {
+/^ [0-9]/ {
 	sub(/^ +/,"");
 	gsub(" ",FS);
 	# accumulate data per author.
@@ -120,26 +134,14 @@ END {
 }'
 );
 
-exit 0; # ****
+[ -z "$stats" ] && [ -n "$verbose" ] && echo "No commits pending from '$branch' to '$baseBranch'" >&2;
 
-git log --format='%ai|%an' $baseBranch..$branch |sed 's/ /|/;' \
-| trdsql -icsv -id '|' -oh "
-select sum(count(*)) over () as ${hdr[0]}
-      ,count(c3)     over () as ${hdr[1]}
-      ,c3                    as ${hdr[2]}
-      ,sum(count(*)) over (partition by c3) as ${hdr[3]}
-      ,min(c1)               as ${hdr[4]}
-      ,max(c1)               as ${hdr[5]}
-from stdin
-group by c3" 2>/dev/null || true
-);
-[ -z "$stats" ] && stats='PendingCommits,AuthorCnt,PrimaryAuthor,PrimaryCommits,FirstCommitDt,LastCommitDt
-0,0,null,0,null,null';
 
-echo "$stats" \
-| trdsql -icsv -ih $outFmt $delim $header '
+# Output the data in the requested format
+hdr=(Author CommitCnt FirstCommitDt LastCommitDt FileModCnt InsertCnt DeleteCnt);
+(IFS="$d"; echo "${hdr[*]}"; echo "$stats";) \
+| trdsql -icsv -id "$d" -ih $outFmt $delim $header '
 select '$prefix'
        *
 from stdin
-order by PrimaryCommits desc
-limit 1';
+order by cast(CommitCnt as int) desc';

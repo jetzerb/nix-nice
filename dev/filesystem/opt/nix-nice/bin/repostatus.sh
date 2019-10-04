@@ -47,7 +47,7 @@ done;
 
 delim=$(printf "\x1f"); # ASCII "unit separator"
 
-git log --format="%h${delim}%ai${delim}%an${delim}%s"  --name-status --no-merges origin/MSSQL-2017..topic/U13438-add-odh-objects \
+git log --format="%h${delim}%ai${delim}%an${delim}%s"  --name-status --no-merges "$BASEBRANCH".."$BRANCH" \
 | awk -F $delim -v OFS=$delim '
 
 # Gather stats from individual commits
