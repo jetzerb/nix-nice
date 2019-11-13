@@ -40,12 +40,10 @@ if [ "$CMD" = "cmp" ]
 then
 	meld "$SRC" "$TGT";
 else
-	EXCLUDES="";
-	for FILE in ~/.config/rsync/*exclu*
+	EXCLUDES=();
+	for FILE in ~/.config/rsync/*excl*
 	do
-		[-f "$FILE"] && EXCLUDES="$EXCLUDES --exclude-from=\"$FILE\"";
+		[ -f "$FILE" ] && EXCLUDES+=(--exclude-from="$FILE");
 	done;
-	rsync -av --del \
-	      $EXCLUDES \
-	      "$SRC" "$TGT";
+	rsync -av --del "${EXCLUDES[@]}" "$SRC" "$TGT";
 fi;
