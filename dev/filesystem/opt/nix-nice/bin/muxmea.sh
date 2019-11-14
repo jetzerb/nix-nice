@@ -16,8 +16,12 @@ case "$1" in
 		exit 0;
 esac;
 
-PROJDIR=$(find ~/src -mindepth 3 -maxdepth 3 -type d -iname "*$1*" | head -1);
-PROJDIR=${PROJDIR#$HOME/src/*/};
+for BASE in ~/src ~/hosthome/src
+do
+	PROJDIR=$(find $BASE -mindepth 3 -maxdepth 3 -type d -iname "*$1*" | head -1);
+	[ -n "$PROJDIR" ] && break;
+done;
+PROJDIR=${PROJDIR#$BASE/*/};
 SESSION=$(echo $1 |tr 'a-z' 'A-Z');
 
 # detach from any existing session first
@@ -45,11 +49,11 @@ then
 		do
 			if [ $EXIST -eq 0 ]
 			then
-				cd "$HOME/src/$DIR/$PROJDIR";
+				cd "$BASE/$DIR/$PROJDIR";
 				tmux new-session -s $SESSION -n "$DIR$ITER" -d;
 				EXIST=1;
 			else
-				tmux new-window -t $SESSION -n "$DIR$ITER" -c "$HOME/src/$DIR/$PROJDIR";
+				tmux new-window -t $SESSION -n "$DIR$ITER" -c "$BASE/$DIR/$PROJDIR";
 			fi;
 		done;
 	done;
