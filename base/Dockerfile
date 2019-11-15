@@ -1,5 +1,5 @@
 # Base layer
-FROM ubuntu:19.04
+FROM ubuntu:19.10
 
 # Container attributes...
 LABEL about="Generic Ubuntu-based Linux environment"
