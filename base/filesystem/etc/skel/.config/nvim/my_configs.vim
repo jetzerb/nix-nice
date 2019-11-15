@@ -18,7 +18,14 @@ set shiftwidth=8
 set tabstop=8
 
 " I also like to see line numbers while I'm editing
-set number
+" Hybrid, so it shows current line number and relative offset above & below
+" when in normal mode, but absolute line numbers in insert mode
+set number relativenumber
+augroup numbertoggle
+	autocmd!
+	autocmd BufEnter,FocusGained,InsertLeave,WinEnter * if &nu | set rnu   | endif
+	autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &nu | set nornu | endif
+augroup END
 
 " case insensitive searches unless mixed case search expression
 set ignorecase
