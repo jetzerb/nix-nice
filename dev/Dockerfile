@@ -23,12 +23,14 @@ apt-get -yq install --no-install-recommends \
 # developer tools
 	git                  $(: source control manager) \
 	git-lfs              $(: git add-on for handling BLOBs) \
+	sqitch               $(: sane database change management) \
 #
 # Productivity
 	howdoi               $(: ask a coding question, get an answer) \
 #
-# the go-to db engine
+# the go-to db tools
 	sqlite3              $(: small, fast, SQL db engine, most-used in the world) \
+	postgresql-client    $(: psql and friends) \
 #
 # VS Code pre-requisites
 	libnotify4 \
