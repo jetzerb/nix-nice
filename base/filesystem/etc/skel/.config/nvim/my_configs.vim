@@ -18,7 +18,8 @@ set shiftwidth=8
 set tabstop=8
 
 " I also like to see line numbers while I'm editing
-set number
+" Hybrid, so it shows current line number and relative offset above & below
+set number relativenumber
 
 " case insensitive searches unless mixed case search expression
 set ignorecase
