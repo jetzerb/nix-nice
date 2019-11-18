@@ -44,6 +44,11 @@ apt-get -yq install --no-install-recommends \
 #
 # OSquery pre-requisites
 	libc++1 \
+#
+# Migra pre-requisites
+	python3-pip \
+	python3-setuptools \
+	python3-wheel \
 ; \
 #
 # remove package lists to trim > 20MB of cruft
@@ -76,6 +81,9 @@ ce /tmp/install; \
 URL=https://github.com/osquery/osquery/releases; \
 wget -O osquery.deb $(lynx --dump $URL | sed -n '/[0-9][0-9]*\. https.*deb/ {s/.*https/https/; p;}'); \
 dpkg -i osquery.deb; \
+#
+# Migra: Schema diff for PostgreSQL
+pip install migra[pg]; \
 #
 #
 # Postman: API Development Environment
