@@ -34,7 +34,8 @@ apt-get -yq install --no-install-recommends \
 RUN \
 #
 # Azure CLI
-curl -sL https://aka.ms/InstallAzureCLIDeb | bash; \
+# NOTE: As of 2019-11-18, MS has no eoan pkg repository, so use prior version
+curl -sL https://aka.ms/InstallAzureCLIDeb | sed 's/${CLI_REPO}/disco/g;' | bash; \
 #
 # Now the DevOps extension to Azure CLI
 az extension add --name azure-devops; \
