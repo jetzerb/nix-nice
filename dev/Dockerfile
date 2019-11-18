@@ -49,6 +49,10 @@ apt-get -yq install --no-install-recommends \
 	python3-pip \
 	python3-setuptools \
 	python3-wheel \
+#
+# Newman (Postman automation vi CLI) pre-requisites
+	nodejs \
+	npm \
 ; \
 #
 # remove package lists to trim > 20MB of cruft
@@ -83,7 +87,7 @@ wget -O osquery.deb $(lynx --dump $URL | sed -n '/[0-9][0-9]*\. https.*deb/ {s/.
 dpkg -i osquery.deb; \
 #
 # Migra: Schema diff for PostgreSQL
-pip install migra[pg]; \
+pip3 install migra[pg]; \
 #
 #
 # Postman: API Development Environment
@@ -96,6 +100,8 @@ mkdir bin; \
 cd bin; \
 ln -s ../app/Postman postman; \
 rm /tmp/install/linux64; \
+#
+npm install -g newman; \
 #
 #
 # feature-rich bash prompt for git
