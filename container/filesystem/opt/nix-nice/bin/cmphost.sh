@@ -45,5 +45,6 @@ else
 	do
 		[ -f "$FILE" ] && EXCLUDES+=(--exclude-from="$FILE");
 	done;
+	mkdir -p "$TGT"; # rsync won't create the target directory
 	rsync -av --del "${EXCLUDES[@]}" "$SRC" "$TGT";
 fi;
