@@ -66,6 +66,7 @@ apt-get -yq install --no-install-recommends \
 	wget                  $(: download files from the internet) \
 	curl                  $(: download files from the internet) \
 	meld                  $(: visual merge/diff tool) \
+	parallel              $(: run commands simultaneously) \
 	ministat              $(: statistics tool) \
 	imagemagick           $(: view and modify images) \
 	gnuplot-nox           $(: no-X version of gnuplot so we install 3MB instead of 300) \
