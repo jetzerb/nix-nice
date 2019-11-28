@@ -1,14 +1,17 @@
 #!/bin/bash
 set -euo pipefail;
 
-PROJECT=${1:-};
+project=${1:-};
 
-if [ -z "$PROJECT" ]
+# strip the prefix off of the current working dir
+path=$(echo "$PWD" | sed 's!^.*/\(src/\)!\1!;');
+
+if [ -z "$project" ]
 then
-	PROJECT=$(echo ${PWD#$HOME} | awk -F '/' '{print $5;}');
+	project=$(echo "$path" | awk -F '/' '{print $4;}');
 fi;
 
-if [ -z "$PROJECT" ]
+if [ -z "$project" ]
 then
 	echo "Not in a project directory, and no project specified.";
 	exit 1;
@@ -16,23 +19,23 @@ fi;
 
 # Figure out how to get the list of repos based on the current
 # working directory
-URL=$(echo ${PWD#$HOME} | awk -F '/' '{sub("=","/",$4); print $4;}');
+url=$(echo "$path" | awk -F '/' '{sub("=","/",$3); print $3;}');
 
-echo "Repos at '$URL' for project/user '$PROJECT'";
+echo "Repos at '$url' for project/user '$project'";
 
-case "$URL" in
+case "$url" in
 	dev.azure.com/*)
-		az repos list --project "$PROJECT" |
+		az repos list --project "$project" |
 		jq '.[] | {isFork, name}' |
 		trdsql -ijson -oat 'select isFork, name from - order by isFork, name'
 		;;
 	github.com)
-		curl -s https://api.github.com/users/"$PROJECT"/repos |
-		trdsql -ijson -oat '
+		curl -s https://api.github.com/users/"$project"/repos |
+		trdsql -driver sqlite3 -ijson -oat '
 			select fork, name, created_at, updated_at, description
 			from -
 			order by fork, name'
 		;;
 	*)
-		echo "Unhandled source control provider: '$URL'";;
+		echo "Unhandled source control provider: '$url'";;
 esac;

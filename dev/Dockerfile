@@ -24,6 +24,7 @@ apt-get -yq install --no-install-recommends \
 	git                  $(: source control manager) \
 	git-lfs              $(: git add-on for handling BLOBs) \
 	sqitch               $(: sane database change management) \
+	shellcheck           $(: so you can write proper shell scripts) \
 #
 # Productivity
 	howdoi               $(: ask a coding question, get an answer) \
