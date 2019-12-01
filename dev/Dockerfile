@@ -67,6 +67,11 @@ rm -rf /var/lib/apt/lists/*;
 
 RUN \
 #
+# Fleck: a Clojure-like LISP that runs wherever Bash is
+DIR=/opt/flk/bin; \
+mkdir -p $DIR; \
+curl -s https://chr15m.github.io/flk/flk > $DIR/flk && chmod 755 $DIR/flk; \
+#
 # VS Code: Code Editor
 mkdir -p /tmp/install; \
 cd /tmp/install; \
