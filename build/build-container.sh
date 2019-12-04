@@ -16,12 +16,12 @@ then
 fi;
 
 # Reproduce all the Docker variables and make them available to the hooks
-export SOURCE_BRANCH=$(git rev-parse --abbrev-ref HEAD);
-export SOURCE_COMMIT=$(git log -1 --format='%H');
-export COMMIT_MSG=$(git log -1 --format='%s');
+export SOURCE_BRANCH="$(git rev-parse --abbrev-ref HEAD)";
+export SOURCE_COMMIT="$(git log -1 --format='%H')";
+export COMMIT_MSG="$(git log -1 --format='%s')";
 export DOCKER_REPO='jetzerb/nix-nice';
-export DOCKERFILE_PATH=$PWD;
-export CACHE_TAG=$VER;
+export DOCKERFILE_PATH="$PWD";
+export CACHE_TAG="$VER";
 export IMAGE_NAME="$DOCKER_REPO:$CACHE_TAG";
 
 echo "Building Image $IMAGE_NAME";
