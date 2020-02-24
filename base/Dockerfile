@@ -1,5 +1,5 @@
 # Base layer
-FROM ubuntu:19.04
+FROM ubuntu:20.04
 
 # Container attributes...
 LABEL about="Generic Ubuntu-based Linux environment"
@@ -37,7 +37,6 @@ L="$L $P"; \
 #
 P=""; \
 # system level packages
-P="$P software-properties-common"; : so we can add ppa repositories; \
 P="$P locales";               : so we speak the right language; \
 P="$P openssh-server";        : so we can connect to our container via SSH; \
 P="$P xauth";                 : facilitates X11 forwarding in SSH; \
@@ -88,18 +87,18 @@ P="$P sc";                    : text-base spreadsheet; \
 P="$P rxvt-unicode";          : for running a terminal on a local X server; \
 P="$P fonts-dejavu";          : nice looking unicode terminal font; \
 P="$P xpdf";                  : lightest weight pdf viewer around; \
-#       powerline patched dejavu fonts added below
-apt-get -yq install --no-install-recommends $P; \
-L="$L $P"; \
+# powerline patched dejavu fonts added below
 #
-# Add repository containing "bitwise" and then install it
-add-apt-repository ppa:ramon-fried/bitwise; \
-P="bitwise"; \
-apt-get -yq install --no-install-recommends $P; \
-L="$L $P"; \
-dpkg -l $L >> $MANIFEST 2>&1; \
+BUILDPKGS="lsb-release"; \
+apt-get -yq install --no-install-recommends $BUILDPKGS $P; \
 #
-# remove package lists to trim > 20MB of cruft
+lsb_release -a >> $MANIFEST 2>&1; \
+L="$L $P"; \
+dpkg -l $L >> $MANIFEST 2>&1; : capture version info for all packages we just installed; \
+#
+# cleanup
+apt-get remove -yq --purge $BUILDPKGS; \
+apt-get -yq autoremove; \
 rm -rf /var/lib/apt/lists/*;
 
 
@@ -110,29 +109,8 @@ rm -rf /var/lib/apt/lists/*;
 
 RUN \
 #
-# New env for each "RUN"; avoid ENV for sake of install script
+# New env for each "RUN"; avoid ENV for sake of our install script
 MANIFEST=/opt/nix-nice/etc/manifest.txt; \
-#
-# pull most recent date & commit id from a github repo
-printVer() { \
-	# 1=command, 2=git URL
-	echo -n "$1 "; \
-	lynx --dump "$2"/commits/master \
-	| awk '/Commits on / { \
-		sub(/.*Commits on /,""); \
-		v = $0; \
-		i = 0; \
-		while (i < 3) { \
-			getline; \
-			if ($0 ~ /^  *\[/) { i++; } \
-		} \
-		sub(/.*\]/,""); \
-		printf("%s %s\n",v,$0); \
-		exit; \
-	}'; \
-}; \
-logVer() { printVer $1 $2 >> $MANIFEST 2>&1; }; \
-L=""; \
 #
 # ToyBox and BusyBox don't overlap completely, so add both.
 CMD=toybox; \
@@ -167,47 +145,68 @@ do \
 done; \
 #
 # prep area for additional downloads that don't exist in the Ubuntu package repositories
-mkdir -p /tmp/install; \
+TMP=/tmp/install; \
+GITHUB=https://github.com; \
+mkdir -p $TMP; \
+L=""; \
+P=""; \
+BUILDPKGS="build-essential libncurses5-dev libreadline-dev libcunit1-dev git"; \
+apt-get update; \
+apt-get install -yq --no-install-recommends $BUILDPKGS; \
+#
+# Bitwise doesn't have a ubuntu package for us yet so build from source
+cd $TMP; \
+wget $(lynx --dump https://github.com/mellowcandle/bitwise/releases/ |grep 'http.*bitwise-v.*\.tar\.gz' |head -1 |sed 's/.*http/http/;'); \
+tar zxf bitwise*.tar.gz; \
+rm bitwise*.tar.gz; \
+cd bitwise*; \
+./configure; \
+make; \
+./bitwise --version >>$MANIFEST; \
+DIR="/opt/bitwise/bin"; \
+mkdir -p $DIR; \
+mv bitwise $DIR; \
 #
 # Install ripgrep
 # rg > ag > ack > grep
-cd /tmp/install; \
-URL=https://github.com/BurntSushi/ripgrep/releases; \
-wget -nv $(lynx --dump $URL |grep "$URL.*download.*ripgrep.*amd64\.deb$" | sed -n '1{s/.*http/http/;p;}'); \
-dpkg -i ripgrep*.deb; \
-L="$L ripgrep"; \
+cd $TMP; \
+CMD=ripgrep; \
+URL=$GITHUB/BurntSushi/$CMD/releases; \
+wget -nv $(lynx --dump $URL |grep "$URL.*download.*${CMD}.*amd64\.deb$" | sed -n '1{s/.*http/http/;p;}'); \
+dpkg -i $CMD*.deb; \
+L="$L $CMD"; \
 #
 # Install xsv (parse delimited files)
-cd /tmp/install; \
+cd $TMP; \
 CMD=xsv; \
 DIR=/opt/$CMD/bin; \
 mkdir -p $DIR; \
-URL=https://github.com/BurntSushi/xsv/releases; \
-wget -nv $(lynx --dump $URL |grep "$URL.*download.*xsv.*x86.*64.*linux.*gz" | sed -n '1{s/.*http/http/;p;}'); \
-tar -xzf xsv*.gz; \
+URL=$GITHUB/BurntSushi/$CMD/releases; \
+wget -nv $(lynx --dump $URL |grep "$URL.*download.*${CMD}.*x86.*64.*linux.*gz" | sed -n '1{s/.*http/http/;p;}'); \
+tar -xzf $CMD*.gz; \
 mv $CMD $DIR; \
 echo "$CMD $($DIR/$CMD --version)" >> $MANIFEST 2>&1; \
 #
 # Install gron (makes JSON greppable)
-cd /tmp/install; \
+cd $TMP; \
 CMD=gron; \
 DIR=/opt/$CMD/bin; \
 mkdir -p $DIR; \
-URL=https://github.com/tomnomnom/gron/releases; \
-wget -nv $(lynx --dump $URL |grep "$URL.*gron-linux-amd64.*tgz" | sed -n '1{s/.*http/http/;p;}'); \
-tar -xzf gron*tgz; \
+URL=$GITHUB/tomnomnom/$CMD/releases; \
+wget -nv $(lynx --dump $URL |grep "$URL.*${CMD}-linux-amd64.*tgz" | sed -n '1{s/.*http/http/;p;}'); \
+tar -xzf $CMD*tgz; \
 mv $CMD $DIR; \
 $DIR/$CMD --version >> $MANIFEST 2>&1; \
 #
 # Install trdsql (parse a variety of file types using SQL)
-cd /tmp/install; \
+cd $TMP; \
 CMD=trdsql; \
 DIR=/opt/$CMD/bin; \
 mkdir -p $DIR; \
-URL=https://github.com/noborus/trdsql/releases; \
-wget -nv $(lynx --dump $URL | grep "$URL.*trdsql.*linux.*64.*zip" | sed -n '1{s/.*http/http/;p;}'); \
-unzip -q -o trdsql*.zip; \
-cd trdsql*linux*; \
+URL=$GITHUB/noborus/$CMD/releases; \
+wget -nv $(lynx --dump $URL | grep "$URL.*${CMD}.*linux.*64.*zip" | sed -n '1{s/.*http/http/;p;}'); \
+unzip -q -o $CMD*.zip; \
+cd $CMD*linux*; \
 mv $CMD $DIR; \
 mv README.md $(dirname $DIR); \
 mkdir -p /etc/skel/.config/$CMD; \
@@ -217,9 +216,9 @@ echo "$CMD $($DIR/$CMD --version)" >> $MANIFEST 2>&1; \
 # Install bat (pager w/syntax highlighting and git integration; can be used as replacement for cat)
 # Install fd (file finder)
 # Install hexyl (colorized hex dump utility)
-cd /tmp/install; \
+cd $TMP; \
 for CMD in bat fd hexyl; do \
-	URL=https://github.com/sharkdp/$CMD/releases; \
+	URL=$GITHUB/sharkdp/$CMD/releases; \
 	wget -nv $(lynx --dump $URL |grep "$URL.*download.*${CMD}.*amd64\.deb$" | grep -v 'musl' | sed -n '1{s/.*http/http/;p;}'); \
 	dpkg -i ${CMD}*.deb; \
 	L="$L $CMD"; \
@@ -227,59 +226,53 @@ done; \
 TGT=/etc/skel/.config/bat; \
 mkdir -p $TGT; \
 TGT=$TGT/config; \
-echo ": Options for bat (https://github.com/sharkdp/bat)" > $TGT; \
+echo ": Options for bat ($GITHUB/sharkdp/bat)" > $TGT; \
 echo -e "\n--pager='/usr/bin/less -iKMQRWX'" >> $TGT; \
 #
 # One can never have too many hex editors.
-cd /tmp/install; \
-URL=https://github.com/evanmiller/hecate/releases; \
-wget -nv $(lynx --dump $URL |grep "$URL.*download.*hecate.*amd64\.deb$" | sed -n '1{s/.*http/http/;p;}'); \
-dpkg -i hecate*.deb; \
-L="$L hecate"; \
+cd $TMP; \
+CMD=hecate; \
+URL=$GITHUB/evanmiller/$CMD/releases; \
+wget -nv $(lynx --dump $URL |grep "$URL.*download.*${CMD}.*amd64\.deb$" | sed -n '1{s/.*http/http/;p;}'); \
+dpkg -i $CMD*.deb; \
+L="$L $CMD"; \
 #
-# Install perl extension to adjust urxvt font size on the fly
-cd /tmp/install; \
-CMD=urxvt-font-size; \
-URL=https://github.com/majutsushi/$CMD; \
-wget -nv $URL/archive/master.zip; \
-unzip -q -o master.zip; \
-rm master.zip; \
-cd urxvt-font-size-master; \
-dos2unix font-size; : just in case; \
-mkdir -p /etc/skel/.urxvt/ext/; \
-mv font-size /etc/skel/.urxvt/ext/; \
-logVer "$CMD" "$URL"; \
+# install git temporarily just to assist with installation of other software
+apt-get -yq install --no-install-recommends git; \
+# Helper function:
+# clone a git repo, use latest commit ID as version, and remove ".git" dir
+getGitHubAndLogVersion() { \
+	git clone --depth 1 https://github.com/$1/${2}.git; \
+	cd $2; \
+	echo "$2 - $(git log --format='%h - %ai')" >> $MANIFEST 2>&1; \
+	rm -rf .git; \
+	cd ..; \
+}; \
 #
 # Install "The Ultimate Vim Configuration"
-cd /tmp/install; \
+cd $TMP; \
 CMD=vimrc; \
-URL=https://github.com/amix; \
-wget -nv $URL/$CMD/archive/master.zip; \
-unzip -q -o master.zip; \
-rm master.zip; \
-mv vimrc-master /etc/profile.d/vim_runtime; \
+getGitHubAndLogVersion amix $CMD; \
+mv $CMD /etc/profile.d/vim_runtime; \
 mkdir -p /etc/skel/.config/nvim; \
 cd /etc/skel/.config/nvim; \
 /etc/profile.d/vim_runtime/install_awesome_parameterized.sh /etc/profile.d/vim_runtime root; \
-mv ~/.vimrc ./init.vim; \
-sed -i 's![^ \]*\(/my_configs\)!~/.config/nvim\1!;' init.vim; \
-# until git is installed, move some of the awesomeness out of the way
+mv ~/.$CMD ./init.vim; \
+# point "my_configs" to user's home dir
+sed -i 's![^ ]*\(/my_configs\)!~/.config/nvim\1!;' init.vim; \
+# until git is installed permanently, move some of the awesomeness out of the way
 cd /etc/profile.d/vim_runtime; \
 for FILE in $(find . -type f -name '*.vim' -exec grep -il 'git.executable' {} \; | sed 's!^..\([^/]*/[^/]*\)/.*!\1!;' |sort -u); \
 do \
 	mkdir -p zz${FILE%/*}; \
 	mv $FILE zz${FILE%/*}; \
 done; \
-logVer "$CMD" "$URL"; \
 #
 # Install "pretty and versatile" tmux configuration
-cd /tmp/install; \
+cd $TMP; \
 CMD=.tmux; \
-URL=https://github.com/gpakosz/$CMD; \
-wget -nv $URL/$CMD/archive/master.zip; \
-unzip -q -o master.zip; \
-rm master.zip; \
-cd .tmux-master; \
+getGitHubAndLogVersion gpakosz $CMD; \
+cd $CMD; \
 dos2unix .tmux.conf*; : just in case \
 # add weather to the status line, and enable powerline glyphs
 sed -i -e '/^:.*navigation/{s/.*/# nix-nice# set terminal to "tmux" so we can have italics\nset -g default-terminal "tmux"\n&/;}' \
@@ -289,39 +282,37 @@ sed -i -e '/^:.*navigation/{s/.*/# nix-nice# set terminal to "tmux" so we can ha
 cp .tmux.conf /etc/profile.d/tmux.conf; \
 ln -s /etc/profile.d/tmux.conf /etc/skel/.tmux.conf; \
 cp .tmux.conf.local /etc/skel; \
-logVer "$CMD" "$URL"; \
 #
 # Overlay powerline fonts
-cd /usr/share/fonts/truetype/dejavu/; \
-rm *Mono*; \
-CMD=powerline/fonts; \
-URL=https://github.com/$CMD; \
-wget -nv $(lynx --dump $URL/blob/master/DejaVuSansMono |sed -n '/https.*Mono.*ttf/{s/.*https/https/; s!/blob/!/raw/!; s/ /%20/g; p;}'); \
-logVer "$CMD" "$URL"; \
+cd $TMP; \
+CMD=fonts; \
+getGitHubAndLogVersion powerline $CMD; \
+DIR=/usr/share/fonts/truetype/dejavu; \
+rm $DIR/*Mono*; \
+cp $CMD/DejaVuSansMono/*.ttf $DIR; \
 #
 # tldr bash client with colorful output
 CMD=tldr; \
 DIR=/opt/$CMD/bin; \
-wget -nv https://4e4.win/tldr; \
+mkdir -p $DIR; \
+wget -nv https://4e4.win/$CMD; \
 chmod +x $CMD; \
-echo 'cachedir=~/.local/share/tldr' >> /etc/skel/.bashrc; : not using xdg, so this is cache dir \
+echo 'cachedir=~/.local/share/'$CMD >> /etc/skel/.bashrc; : not using xdg, so this is cache dir; \
 echo 'complete -W "q=($cachedir/*/*; sed '"'s@\.md @ @g'"' <<<${q[@]:#*/})" tldr' >> /etc/skel/.bashrc; : auto complete for tldr; \
 mv $CMD $DIR; \
 $DIR/$CMD --version | grep version >> $MANIFEST 2>&1; \
 #
 # fuzzy finder
+CMD=fzf; \
 cd /opt; \
-[ -d fzf ] && rm -rf fzf; \
-wget -nv https://github.com/junegunn/fzf/archive/master.zip; \
-unzip -q -o master.zip; \
-rm master.zip; \
-mv fzf-master fzf; \
-cd fzf; \
+getGitHubAndLogVersion junegunn $CMD; \
+cd $CMD; \
 find . -type f -exec dos2unix {} \; ; : just in case; \
 echo -e "n\nn\nn\n" |./install; : answer no to the three questions asked; \
-echo "fzf $(bin/fzf --version)" >> $MANIFEST 2>&1; \
 #
 # cleanup
+apt-get remove -yq --purge $BUILDPKGS; \
+apt-get -yq autoremove; \
 dpkg -l $L >> $MANIFEST 2>&1; \
 cd /tmp; \
 rm -rf install; \
@@ -330,9 +321,11 @@ rm -rf install; \
 # Configure the stuff we just installed
 #
 # ubuntu auto-generates server keys for SSH;
-# just need to turn on X11 forwarding for remote clients
+# just need to turn on X11 forwarding for remote clients and work around
+# an issue where X11 forwarding only works if you restrict to ipv4
 sed -i -e '/X11Forwarding/  {s/^#//; s/no/yes/;}' \
        -e '/X11UseLocalhost/{s/^#//; s/yes/no/;}' \
+       -e '/AddressFamily/  {s/^#//; s/any/inet/;}' \
 	/etc/ssh/sshd_config; \
 #
 # jump to /etc for a few things
