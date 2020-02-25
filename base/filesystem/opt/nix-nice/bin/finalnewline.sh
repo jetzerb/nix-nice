@@ -14,7 +14,8 @@ do
 	TOT=$((TOT+1));
 	EOL=$(tail -c4 "$FILE" | od -tx1 -A none);
 	case "$EOL" in
-		*0[ad]*) continue ;; # file already has trailing CR/LF
+		*0[ad] | *0[ad]" 00")
+			continue ;; # file already has trailing CR/LF
 	esac;
 
 	UPD=$((UPD+1));
