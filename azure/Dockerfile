@@ -66,13 +66,14 @@ az version >> $MANIFEST; \
 # Azure Data Studio (the new SSMS)
 # (scrape the download page to make sure we get the latest version)
 cd $TMP; \
+CMD=azuredatastudio; \
 lynx --dump https://docs.microsoft.com/en-us/sql/azure-data-studio/download > download_page; \
-wget -O ads.deb $( \
+wget -O ${CMD}.deb $( \
 	awk '/\[[0-9]+\]\.deb/ {gsub("[^0-9]",""); LINK="^ +" $0 "\. https";} \
 	     /^References$/ {INREFS=1;} \
 	     INREFS == 1 && $0 ~ LINK {print $2;}' download_page); \
-dpkg -i ads.deb; \
-azuredatastudio --version >> $MANIFEST; \
+dpkg -i ${CMD}.deb; \
+dpkg -l $CMD >> $MANIFEST; \
 #
 #
 # remove package lists to trim > 20MB of cruft
