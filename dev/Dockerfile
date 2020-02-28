@@ -114,7 +114,7 @@ L="$L $CMD"; \
 #
 # DBeaver: Free Universal Database Tool
 cd $TMP; \
-CMD=dbeaver-cd; \
+CMD=dbeaver-ce; \
 wget https://$CMD.io/files/$CMD_latest_amd64.deb; \
 dpkg -i $CMD*.deb; \
 rm $CMD*.deb; \
