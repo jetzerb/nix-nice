@@ -13,18 +13,34 @@ RUN \
 #
 # SOFTWARE INSTALL START
 #
-DEBIAN_FRONTEND=noninteractive; $(: so no packages stop to ask us questions) \
+# make sure our manifest file exists
+MANIFEST=/opt/nix-nice/etc/manifest.txt; \
+mkdir -p $(dirname $MANIFEST); \
+echo "\n\n" >> $MANIFEST; \
+echo "Nix-Nice Azure Manifest:" |sed 'h; s/./-/g; p; x;' >> $MANIFEST; \
+#
+# Install the packages we want
+DEBIAN_FRONTEND=noninteractive; : so no packages stop to ask us questions; \
 apt-get update; \
 #
+L=""; \
+P=""; \
 #
 # Now install the rest of the packages
-apt-get -yq install --no-install-recommends \
 #
 # Azure Data Studio pre-requisites
-	libxss1 \
-	libgconf-2-4 \
-	libunwind8 \
-;
+P="$P libxss1"; \
+P="$P libgconf-2-4"; \
+P="$P libunwind8"; \
+#
+apt-get -yq install --no-install-recommends $P; \
+#
+L="$L $P"; \
+dpkg -l $L >> $MANIFEST 2>&1; : capture version info for all packages we just installed; \
+#
+# cleanup
+rm -rf /var/lib/apt/lists/*;
+
 
 
 #
@@ -33,32 +49,38 @@ apt-get -yq install --no-install-recommends \
 
 RUN \
 #
+# prep work for additional apps
+MANIFEST=/opt/nix-nice/etc/manifest.txt; \
+TMP=/tmp/install; \
+mkdir -p $TMP; \
+
 # Azure CLI
-# NOTE: As of 2019-11-18, MS has no eoan pkg repository, so use prior version
-curl -sL https://aka.ms/InstallAzureCLIDeb | sed 's/${CLI_REPO}/disco/g;' | bash; \
+# NOTE: tweak the sed script based on latest available package
+curl -sL https://aka.ms/InstallAzureCLIDeb | sed 's/${CLI_REPO}/eoan/g;' | bash; \
 #
 # Now the DevOps extension to Azure CLI
 az extension add --name azure-devops; \
+az version >> $MANIFEST; \
 #
 #
 # Azure Data Studio (the new SSMS)
 # (scrape the download page to make sure we get the latest version)
-mkdir -p /tmp/install; \
-cd /tmp/install; \
+cd $TMP; \
 lynx --dump https://docs.microsoft.com/en-us/sql/azure-data-studio/download > download_page; \
 wget -O ads.deb $( \
 	awk '/\[[0-9]+\]\.deb/ {gsub("[^0-9]",""); LINK="^ +" $0 "\. https";} \
 	     /^References$/ {INREFS=1;} \
 	     INREFS == 1 && $0 ~ LINK {print $2;}' download_page); \
 dpkg -i ads.deb; \
+azuredatastudio --version >> $MANIFEST; \
 #
 #
 # remove package lists to trim > 20MB of cruft
 rm -rf /var/lib/apt/lists/*; \
 #
-# clean up the tmp dir
+# clean up after software downloads
 cd /tmp; \
-rm -rf install; \
+rm -rf $TMP; \
 #
 #
 #
@@ -69,3 +91,6 @@ echo "Done with major installation and configuration";
 #
 # Set up customizations and additions to the system
 COPY fs/ /
+
+#
+# Inherit exposed ports, entry point, and command from base container
