@@ -7,15 +7,21 @@ LABEL features="meld, neovim, ripgrep, tmux, trdsql, xsv, bat, fd, fzf, ddgr, tl
 LABEL access="SSH, key authentication, X11 forwarding"
 LABEL maintainer="jetzerb@sva.com"
 
-#
-# First layer = various Ubuntu packages
-RUN \
+
 #
 # SOFTWARE INSTALL START
 #
+
+# Manifest file inside the container
+ARG MANIFEST=/opt/nix-nice/etc/manifest.txt
+
+#
+# First layer = various Ubuntu packages
+RUN \
 # make sure our manifest file exists
-MANIFEST=/opt/nix-nice/etc/manifest.txt; \
 mkdir -p $(dirname $MANIFEST); \
+echo "\n\n" >> $MANIFEST; \
+echo "Nix-Nice Base Layer Manifest:" |sed 'h; s/./-/g; p; x;' >> $MANIFEST; \
 #
 # Install the packages we want
 DEBIAN_FRONTEND=noninteractive; : so no packages stop to ask us questions; \
@@ -48,6 +54,7 @@ P="$P at-spi2-core";          : prevent "Error retrieving accessibility bus" war
 P="$P yank";                  : terminal clipboard manager...also installs xsel; \
 P="$P xclip";                 : clipboard utility, for those who prefer it to xsel; \
 P="$P httping";               : ping for http and https; \
+P="$P iputils-ping";          : ping does not work in either busybox or toybox; \
 #
 # basic operating environment
 P="$P busybox";               : lots of utilities in one binary; \
@@ -86,7 +93,7 @@ P="$P sc";                    : text-base spreadsheet; \
 # graphical apps
 P="$P rxvt-unicode";          : for running a terminal on a local X server; \
 P="$P fonts-dejavu";          : nice looking unicode terminal font; \
-P="$P xpdf";                  : lightest weight pdf viewer around; \
+# **** not yet available in 20.04 P="$P xpdf";                  : lightest weight pdf viewer around; \
 # powerline patched dejavu fonts added below
 #
 BUILDPKGS="lsb-release"; \
@@ -95,6 +102,12 @@ apt-get -yq install --no-install-recommends $BUILDPKGS $P; \
 lsb_release -a >> $MANIFEST 2>&1; \
 L="$L $P"; \
 dpkg -l $L >> $MANIFEST 2>&1; : capture version info for all packages we just installed; \
+#
+# **** vvvv ****
+# workaround for setrlimit(RLIMIT_CORE): Operation not permitted
+# error message when using sudo inside a container, per https://bit.ly/2TbceIY
+echo "Set disable_coredump false" >> /etc/sudo.conf; \
+# **** ^^^^ ****
 #
 # cleanup
 apt-get remove -yq --purge $BUILDPKGS; \
@@ -108,9 +121,6 @@ rm -rf /var/lib/apt/lists/*;
 #
 
 RUN \
-#
-# New env for each "RUN"; avoid ENV for sake of our install script
-MANIFEST=/opt/nix-nice/etc/manifest.txt; \
 #
 # ToyBox and BusyBox don't overlap completely, so add both.
 CMD=toybox; \
@@ -162,7 +172,7 @@ rm bitwise*.tar.gz; \
 cd bitwise*; \
 ./configure; \
 make; \
-./bitwise --version >>$MANIFEST; \
+./bitwise --version >> $MANIFEST 2>&1; \
 DIR="/opt/bitwise/bin"; \
 mkdir -p $DIR; \
 mv bitwise $DIR; \
@@ -357,4 +367,3 @@ EXPOSE 22
 # entry point creates users inside the container, based on the users
 # present in the /hosthome bind mount
 ENTRYPOINT ["/opt/nix-nice/sbin/container-startup.sh"]
-CMD ["-epus"]
