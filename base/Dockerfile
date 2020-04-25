@@ -93,7 +93,8 @@ P="$P sc";                    : text-base spreadsheet; \
 # graphical apps
 P="$P rxvt-unicode";          : for running a terminal on a local X server; \
 P="$P fonts-dejavu";          : nice looking unicode terminal font; \
-# **** not yet available in 20.04 P="$P xpdf";                  : lightest weight pdf viewer around; \
+P="$P apvlv";                 : PDF viewer with vi-like key bindings; \
+#
 # powerline patched dejavu fonts added below
 #
 BUILDPKGS="lsb-release"; \
@@ -122,23 +123,16 @@ rm -rf /var/lib/apt/lists/*;
 
 RUN \
 #
-# ToyBox and BusyBox don't overlap completely, so add both.
-CMD=toybox; \
-DIR=/opt/$CMD/bin; \
-mkdir -p $DIR; \
-cd $DIR; \
-wget -nv -O $CMD http://landley.net/toybox/bin/toybox-x86_64; \
-chmod +x $CMD; \
-$DIR/$CMD --version >> $MANIFEST 2>&1; \
-#
-# Per http://enkidu.eu/bbtbmergerzip, use TB when you can,
-# and BB for the rest.  Note that the linked script says
-# to use BB instead of TB for head, tail, gzip.  But those
-# issues have probably been fixed since Feb 2016 when
-# that script was written, and those commands are already
-# installed via the apt instructions above, so no override
-# is implemented here.
-for LIST in "/opt/toybox/bin/toybox --long" "/bin/busybox --list-full"; \
+# Ensure (Toy|Busy)Box links are set up.  Wait until here so that the
+# system is in its final configuration (after removing BUILDPKGS). Only now
+# do we know for sure which executables to create links for.
+# Per http://enkidu.eu/bbtbmergerzip, use TB when you can, and BB for the
+# rest.  Note that the linked script says to use BB instead of TB for head,
+# tail, gzip.  But those issues have probably been fixed since Feb 2016 when
+# that script was written, and those commands are already installed via the
+# apt instructions above, so no override is implemented here.
+makeToyAndBusyBoxLinks() { \
+for LIST in "/opt/toybox/toybox --long" "/bin/busybox --list-full"; \
 do \
 	EXE=${LIST% *}; \
 	echo "Creating links for $EXE:"; \
@@ -153,6 +147,17 @@ do \
 		esac; \
 	done; \
 done; \
+}; \
+#
+# ToyBox and BusyBox don't overlap completely, so add both.
+CMD=toybox; \
+DIR=/opt/$CMD; \
+mkdir -p $DIR; \
+cd $DIR; \
+wget -nv -O $CMD http://landley.net/toybox/bin/toybox-x86_64; \
+chmod +x $CMD; \
+$DIR/$CMD --version >> $MANIFEST 2>&1; \
+makeToyAndBusyBoxLinks; \
 #
 # prep area for additional downloads that don't exist in the Ubuntu package repositories
 TMP=/tmp/install; \
@@ -173,7 +178,7 @@ cd bitwise*; \
 ./configure; \
 make; \
 ./bitwise --version >> $MANIFEST 2>&1; \
-DIR="/opt/bitwise/bin"; \
+DIR="/opt/bitwise"; \
 mkdir -p $DIR; \
 mv bitwise $DIR; \
 #
@@ -189,7 +194,7 @@ L="$L $CMD"; \
 # Install xsv (parse delimited files)
 cd $TMP; \
 CMD=xsv; \
-DIR=/opt/$CMD/bin; \
+DIR=/opt/$CMD; \
 mkdir -p $DIR; \
 URL=$GITHUB/BurntSushi/$CMD/releases; \
 wget -nv $(lynx --dump $URL |grep "$URL.*download.*${CMD}.*x86.*64.*linux.*gz" | sed -n '1{s/.*http/http/;p;}'); \
@@ -200,7 +205,7 @@ echo "$CMD $($DIR/$CMD --version)" >> $MANIFEST 2>&1; \
 # Install gron (makes JSON greppable)
 cd $TMP; \
 CMD=gron; \
-DIR=/opt/$CMD/bin; \
+DIR=/opt/$CMD; \
 mkdir -p $DIR; \
 URL=$GITHUB/tomnomnom/$CMD/releases; \
 wget -nv $(lynx --dump $URL |grep "$URL.*${CMD}-linux-amd64.*tgz" | sed -n '1{s/.*http/http/;p;}'); \
@@ -211,7 +216,7 @@ $DIR/$CMD --version >> $MANIFEST 2>&1; \
 # Install trdsql (parse a variety of file types using SQL)
 cd $TMP; \
 CMD=trdsql; \
-DIR=/opt/$CMD/bin; \
+DIR=/opt/$CMD; \
 mkdir -p $DIR; \
 URL=$GITHUB/noborus/$CMD/releases; \
 wget -nv $(lynx --dump $URL | grep "$URL.*${CMD}.*linux.*64.*zip" | sed -n '1{s/.*http/http/;p;}'); \
@@ -281,13 +286,14 @@ done; \
 # Install "pretty and versatile" tmux configuration
 cd $TMP; \
 CMD=.tmux; \
-getGitHubAndLogVersion gpakosz $CMD; \
+getGitHubAndLogVersion jetzerb $CMD; \
 cd $CMD; \
 dos2unix .tmux.conf*; : just in case \
 # add weather to the status line, and enable powerline glyphs
 sed -i -e '/^:.*navigation/{s/.*/# nix-nice# set terminal to "tmux" so we can have italics\nset -g default-terminal "tmux"\n&/;}' \
-       -e '/tmux_conf_theme_status_right/{s/synchronized} /&:(curl wttr.in?format=3) /;}' \
        -e '/:tmux_conf_theme_.*_separator_/{s/^#//;}' \
+       -e '/tmux_conf_theme_status_right/{s/ / #{custom}/;}' \
+       -e '/os_clipboard/{s/false/true/;}' \
 	.tmux.conf.local; \
 cp .tmux.conf /etc/profile.d/tmux.conf; \
 ln -s /etc/profile.d/tmux.conf /etc/skel/.tmux.conf; \
@@ -303,7 +309,7 @@ cp $CMD/DejaVuSansMono/*.ttf $DIR; \
 #
 # tldr bash client with colorful output
 CMD=tldr; \
-DIR=/opt/$CMD/bin; \
+DIR=/opt/$CMD; \
 mkdir -p $DIR; \
 wget -nv https://4e4.win/$CMD; \
 chmod +x $CMD; \
@@ -326,6 +332,10 @@ apt-get -yq autoremove; \
 dpkg -l $L >> $MANIFEST 2>&1; \
 cd /tmp; \
 rm -rf install; \
+#
+# Now that BUILDPKGS have been removed, restore the Toybox & Busybox links
+# that they overwrote
+makeToyAndBusyBoxLinks; \
 #
 #
 # Configure the stuff we just installed

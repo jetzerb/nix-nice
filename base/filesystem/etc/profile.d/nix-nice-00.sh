@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #
 # additional config/setup to perform at login
 #
@@ -11,14 +13,15 @@ set -o vi;
 
 
 # Include 3rd party exe paths and tab completion
-for myDIR in /opt/* $HOME
+for myDIR in /opt/* $HOME/bin $HOME/.local/bin
 do
 	[ -d "$myDIR" ] || continue;
-	[ -d "$myDIR/bin" ] && [ "$PATH" = "${PATH#*$myDIR/bin*}" ] && export PATH="$myDIR/bin:$PATH";
 	for myFILE in "$myDIR"/*.completion
 	do
 		[ -f "$myFILE" ] && . "$myFILE";
 	done;
+	[ -d "$myDIR/bin" ] && myDIR="$myDIR/bin";
+	[ "$PATH" = "${PATH#*$myDIR}" ] && export PATH="$myDIR:$PATH";
 done;
 unset myDIR myFILE;
 
@@ -66,35 +69,37 @@ fi;
 unset myCMD;
 
 # I like vi
-myCMD="$(which vi)";
+myCMD="$(command -v vi)";
 if [ -n "$myCMD" ]
 then
 	export VISUAL="$myCMD";
 	export EDITOR="$myCMD";
 fi;
-myCMD=$(realpath $myCMD);
+myCMD=$(realpath "$myCMD");
 if [ -n "$myCMD" ]
 then
-	myCMD=$(basename $myCMD);
+	myCMD=$(basename "$myCMD");
 	# less.sh is like less but with color syntax
-	myCMD=/usr/share/$myCMD/runtime/macros/less.sh;
-	[ -f $myCMD ] && alias lesss=$myCMD;
+	myCMD=/usr/share/"$myCMD"/runtime/macros/less.sh;
+	[ -f "$myCMD" ] && alias lesss="$myCMD";
 fi;
 unset myCMD;
 
 
 # nobody likes to type ".sh"
 pushd . >/dev/null;
-for myDIR in $(echo $PATH | sed 's/:/\n/g;')
+IFS=':' read -ra myDIRS <<< "$PATH";
+for myDIR in "${myDIRS[@]}"
 do
-	cd "$myDIR";
-	for myCMD in $(/bin/ls -1f *.sh 2>/dev/null)
+	cd "$myDIR" || continue;
+	for myCMD in $(/bin/ls -1f ./*.sh 2>/dev/null)
 	do
-		alias ${myCMD%.sh}=$myDIR/$myCMD;
+		myCMD=${myCMD#./};
+		alias "${myCMD%.sh}"="$myDIR/$myCMD";
 	done;
 done;
-unset myDIR myCMD;
-popd >/dev/null;
+unset myDIRS myDIR myCMD;
+popd >/dev/null || echo "Unable to pop directory";
 
 #
 # cd up a few directories
@@ -113,14 +118,14 @@ popd >/dev/null;
 # if another parameter is specified, cd to that dir after performing the above actions
 #
 ud() {
-	local TGT I STAR SUB;
+	local TGT I SUB;
 	case "$1" in
 		("" | ^ | ^^ | ^^^ | ^^^^ | ^^^^^ | ^^^^^^)
 			# up to top of repo
 			TGT=$(git rev-parse --show-toplevel 2> /dev/null);
 			TGT=${TGT:-$HOME}; # or home dir if not in a repo
 			I=${#1};
-			while [ $I -gt 1 ]
+			while [ "$I" -gt 1 ]
 			do
 				TGT=$TGT/..;  # back up one more dir for each extra ^
 				I=$((I-1));
@@ -145,7 +150,7 @@ ud() {
 		([0-9] | [0-9][0-9]) # move up "n" dirs
 			TGT=$PWD;
 			I=$1;
-			while [ $I -gt 0 ]
+			while [ "$I" -gt 0 ]
 			do
 				TGT=${TGT%/*}; # remove final "/dirname" from path
 				I=$((I-1));
@@ -155,15 +160,15 @@ ud() {
 			TGT=$1; # pass through commonly used cd idioms
 			;;
 		*)
-			TGT=${PWD%*$1*}$1; # find last occurrence of the pattern in PWD
-			STAR="*";
+			# back up to dir containing the specified pattern
+			TGT=$(echo "$PWD/" | sed 's/\(.*'"${1//\//\\/}"'[^\/]*\)\/.*/\1/;')
 			;;
 	esac;
 	shift;
 
-	SUB=$@;
-	[ -n "$SUB" ] && [ ${SUB:1:1} != / ] && SUB=/$SUB;
-	cd "$TGT"$STAR"$SUB";
+	SUB="$*";
+	[ -n "$SUB" ] && [ "${SUB:1:1}" != "/" ] && SUB="/$SUB";
+	eval 'cd '"$TGT$SUB";  # use eval so globbing works
 }
 
 
@@ -180,6 +185,6 @@ for myFZF in \
 	/opt/fzf/shell/key-bindings.bash \
 	~/.fzf.bash
 do
-	[ -f $myFZF ] && . $myFZF;
+	[ -f "$myFZF" ] && . "$myFZF";
 done;
 unset myFZF;
