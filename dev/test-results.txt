@@ -1,0 +1,160 @@
+
+
+------------
+Command: git
+OK
+
+
+----------------
+Command: git-lfs
+OK
+
+
+---------------
+Command: sqitch
+OK
+
+
+-------------------
+Command: shellcheck
+OK
+
+
+---------------
+Command: howdoi
+OK
+
+
+----------------
+Command: sqlite3
+OK
+
+
+--------------------------
+Command: postgresql-client
+OK
+
+
+-------------------
+Command: libnotify4
+OK
+
+
+--------------------
+Command: libxkbfile1
+OK
+
+
+----------------------
+Command: libsecret-1-0
+OK
+
+
+----------------
+Command: libxss1
+OK
+
+
+----------------
+Command: libnss3
+OK
+
+
+-----------------------------
+Command: default-jre-headless
+OK
+
+
+----------------
+Command: libc++1
+OK
+
+
+--------------------
+Command: python3-pip
+OK
+
+
+---------------------------
+Command: python3-setuptools
+OK
+
+
+----------------------
+Command: python3-wheel
+OK
+
+
+---------------
+Command: nodejs
+OK
+
+
+------------
+Command: npm
+OK
+
+
+------------
+Command: flk
+OK
+
+
+-------------
+Command: code
+OK
+
+
+----------------
+Command: dbeaver
+> Start DBeaver Standalone [org.jkiss.dbeaver.ui.app.standalone 7.0.3.202004191823]
+> Start Eclipse Workbench Model [org.eclipse.e4.ui.model.workbench 2.1.700.v20200113-1422]
+> Start Eclipse Jobs Mechanism [org.eclipse.core.jobs 3.10.700.v20200106-1020]
+> Start Eclipse IDE UI [org.eclipse.ui.ide 3.17.0.v20200217-1511]
+Commands processed. Exit DBeaver.
+OK
+
+
+-------------
+Command: usql
+OK
+
+
+----------------
+Command: osquery
+OK
+
+
+--------------
+Command: migra
+OK
+
+
+----------------
+Command: postman
+OK
+
+
+---------------
+Command: newman
+OK
+
+
+------------------------
+Command: bash-git-prompt
+OK
+
+
+----------------------
+Command: diff-so-fancy
+OK
+
+
+--------------
+Command: vimrc
+OK
+
+
+-----------------
+Command: nix-nice
+OK

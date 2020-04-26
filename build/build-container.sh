@@ -7,21 +7,14 @@
 
 # get version info based on tag attached to HEAD commit
 CUR=${PWD##*/};
-VER=$(git log -1 --format='%D' |sed 's/, */\n/g;' |sed -n "/^tag: $CUR/ {s/^tag: //; p;}" |sort |head -1);
-
-if [ -z "$VER" ]
-then
-	echo "Current HEAD has no tag.";
-	VER="local-$(git log -1 --format='%h')"; # use short commit hash
-fi;
 
 # Reproduce all the Docker variables and make them available to the hooks
 export SOURCE_BRANCH="$(git rev-parse --abbrev-ref HEAD)";
 export SOURCE_COMMIT="$(git log -1 --format='%H')";
 export COMMIT_MSG="$(git log -1 --format='%s')";
-export DOCKER_REPO='jetzerb/nix-nice';
+export DOCKER_REPO="$(../util/get-repo-name --full)";
 export DOCKERFILE_PATH="$PWD";
-export CACHE_TAG="$VER";
+export CACHE_TAG="$CUR-latest";
 export IMAGE_NAME="$DOCKER_REPO:$CACHE_TAG";
 
 echo "Building Image $IMAGE_NAME";

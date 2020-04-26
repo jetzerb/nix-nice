@@ -1,15 +1,12 @@
 #!/usr/bin/env bash
 
-user="jetzerb";
-
-project="$(git rev-parse --show-toplevel)";
-project=${project##*/};
+project="$(../util/get-repo-name --full)";
 
 image=$(dirname "$0");
 image=$(cd "$image"; pwd);
 image=${image##*/};
 
-image="$user/$project:$image-latest";
+image="$project:$image-latest";
 
 # pull out the container manifest
 docker run -i --rm "$image" cat /opt/nix-nice/etc/manifest.txt > manifest.txt
