@@ -1,0 +1,35 @@
+
+
+-------------------
+Command: libffi-dev
+OK
+
+
+----------------
+Command: libxss1
+OK
+
+
+---------------------
+Command: libgconf-2-4
+OK
+
+
+-------------------
+Command: libunwind8
+OK
+
+
+-----------
+Command: az
+OK
+
+
+---------------------
+Command: azure-devops
+ERROR
+
+
+------------------------
+Command: azuredatastudio
+OK
