@@ -242,7 +242,7 @@ TGT=/etc/skel/.config/bat; \
 mkdir -p $TGT; \
 TGT=$TGT/config; \
 echo "# Options for bat ($GITHUB/sharkdp/bat)" > $TGT; \
-echo -e "\n--pager='/usr/bin/less -iKMQRWX'" >> $TGT; \
+echo "\n--pager='/usr/bin/less -iKMQRWX'" >> $TGT; \
 #
 # One can never have too many hex editors.
 cd $TMP; \
@@ -324,7 +324,7 @@ cd /opt; \
 getGitHubAndLogVersion junegunn $CMD; \
 cd $CMD; \
 find . -type f -exec dos2unix {} \; ; : just in case; \
-echo -e "n\nn\nn\n" |./install; : answer no to the three questions asked; \
+echo "n\nn\nn\n" |./install; : answer no to the three questions asked; \
 #
 # cleanup
 apt-get remove -yq --purge $BUILDPKGS; \
