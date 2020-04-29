@@ -171,7 +171,7 @@ cmd='xsv';     checkCommand "$cmd" '$cmd select b $csv';
 json='{"foo": {"bar":"baz"}, "num":123}';
 cmd="gron";    checkCommand "$cmd" 'echo $json | $cmd';
 
-cmd="trdsql";  checkCommand "$cmd" '$cmd -driver sqlite3 -icsv -ih -oat "select c,b from $csv"';
+cmd="trdsql";  checkCommand "$cmd" '$cmd -driver sqlite3 -icsv -ih -oat "select c,b from $csv" && ls /etc/skel/.config/$cmd/config.json';
 
 cmd="bat";     checkCommand "$cmd" '$cmd $csv';
 cmd="fd";      checkCommand "$cmd" '$cmd $csv';
@@ -181,10 +181,10 @@ cmd="hexyl";   checkCommand "$cmd" '$cmd $csv';
 # or how to snag the screen...
 cmd="hecate";  checkCommand "$cmd" 'TERM=xterm "$cmd" "$csv" & kill %1;'
 
-cmd="vimrc";   checkCommand "$cmd" 'ls /etc/profile.d/vim_runtime/*${cmd}*';
-cmd=".tmux";   checkCommand "$cmd" 'ls /etc/skel/${cmd}.conf{,.local} /etc/profile.d/tmux.conf';
+cmd="vimrc";   checkCommand "$cmd" 'dir=/etc/profile.d/vim_runtime; ls $dir/*${cmd}* && ls $dir/zz*';
+cmd=".tmux";   checkCommand "$cmd" '[ -f "$(realpath /etc/skel/${cmd}.conf)" ] && grep "os_clipboard=true" /etc/skel/${cmd}.conf.local';
 cmd="powerline fonts"; checkCommand "$cmd" 'ls /usr/share/fonts/truetype/dejavu/*owerline*';
-cmd="tldr";    checkCommand "$cmd" '$cmd $cmd';
+cmd="tldr";    checkCommand "$cmd" '$cmd $cmd && grep "^complete.*$(q=.*<<<.*##.*$cmd" /etc/skel/.bashrc';
 
 cmd='fzf';     checkCommand "$cmd" '$cmd --version';
 
