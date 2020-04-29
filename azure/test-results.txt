@@ -25,11 +25,6 @@ Command: az
 OK
 
 
----------------------
-Command: azure-devops
-ERROR
-
-
 ------------------------
 Command: azuredatastudio
 OK
