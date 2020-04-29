@@ -138,11 +138,12 @@ do \
 	echo "Creating links for $EXE:"; \
 	for CMD in $($LIST); \
 	do \
+		[ -f "/$CMD" ] && continue; \
 		BASECMD=${CMD##*/}; \
 		case "$(type $BASECMD 2>&1)" in \
 			*"not found"*) \
 				echo "	$CMD"; \
-				ln -s $EXE /$CMD; \
+				ln -s $EXE /"$CMD"; \
 				;; \
 		esac; \
 	done; \
@@ -288,16 +289,15 @@ cd $TMP; \
 CMD=.tmux; \
 getGitHubAndLogVersion jetzerb $CMD; \
 cd $CMD; \
-dos2unix .tmux.conf*; : just in case \
-# add weather to the status line, and enable powerline glyphs
-sed -i -e '/^#.*navigation/{s/.*/# nix-nice# set terminal to "tmux" so we can have italics\nset -g default-terminal "tmux"\n&/;}' \
+# add weather to the status line, and enable powerline glyphs and OS clipboard integration
+sed -i -e '/^#.*navigation/{s/.*/# nix-nice: set terminal to "tmux" so we can have italics\nset -g default-terminal "tmux"\n&/;}' \
        -e '/#tmux_conf_theme_.*_separator_/{s/^#//;}' \
-       -e '/tmux_conf_theme_status_right/{s/ / #{custom}/;}' \
+       -e '/tmux_conf_theme_status_right=/{s/ / #{custom}/;}' \
        -e '/os_clipboard/{s/false/true/;}' \
-	.tmux.conf.local; \
-cp .tmux.conf /etc/profile.d/tmux.conf; \
-ln -s /etc/profile.d/tmux.conf /etc/skel/.tmux.conf; \
-cp .tmux.conf.local /etc/skel; \
+	${CMD}.conf.local; \
+cp ${CMD}.conf /etc/profile.d/tmux.conf; \
+ln -s /etc/profile.d/tmux.conf /etc/skel/${CMD}.conf; \
+cp ${CMD}.conf.local /etc/skel; \
 #
 # Overlay powerline fonts
 cd $TMP; \

@@ -37,8 +37,11 @@ echo "$(date +'%Y-%m-%d %H:%M:%S.%N'): Running tests";
 
 # run unit test/validation for all installed software packages
 echo "$(date +'%Y-%m-%d %H:%M:%S.%N'): running verification/tests";
+testscript="$(mktemp)";
 verify="verify-installed-software";
-docker run -i --rm "$image" bash <(cat "${verify}-hdr" "${verify}.sh")  > test-results.txt 2>&1
+cat "${verify}-hdr" "${verify}.sh" > "$testscript";
+docker run -i --rm "$image" bash < "$testscript"  > test-results.txt 2>&1;
+rm "$testscript";
 
 echo "$(date +'%Y-%m-%d %H:%M:%S.%N'): done";
 
