@@ -42,7 +42,7 @@ docker run -i --rm "$image" bash < verify-installed-software.sh  > test-results.
 echo "$(date +'%Y-%m-%d %H:%M:%S.%N'): done";
 
 
-# Advertise any errors encoutered during testing
+# Advertise any errors encountered during testing
 error=$(
 awk '
 /^ERROR/ {
