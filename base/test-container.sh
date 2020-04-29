@@ -17,7 +17,7 @@ cat /opt/nix-nice/etc/manifest.txt;
 IFS=$'\n';
 
 hdr() {
-	echo "$1" |sed 'h; s/.*//; p;p;p; x; h; s/./-/g; p; x;';
+	echo "$1" |sed 'h; s/./-/g; s/^/\n\n\n/; p; x;';
 }
 
 hdr "Defaults For New Users";
@@ -37,7 +37,8 @@ echo "$(date +'%Y-%m-%d %H:%M:%S.%N'): Running tests";
 
 # run unit test/validation for all installed software packages
 echo "$(date +'%Y-%m-%d %H:%M:%S.%N'): running verification/tests";
-docker run -i --rm "$image" bash < verify-installed-software.sh  > test-results.txt 2>&1
+verify="verify-installed-software";
+docker run -i --rm "$image" bash <(cat "${verify}-hdr" "${verify}.sh")  > test-results.txt 2>&1
 
 echo "$(date +'%Y-%m-%d %H:%M:%S.%N'): done";
 
