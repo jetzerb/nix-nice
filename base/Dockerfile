@@ -241,7 +241,7 @@ done; \
 TGT=/etc/skel/.config/bat; \
 mkdir -p $TGT; \
 TGT=$TGT/config; \
-echo ": Options for bat ($GITHUB/sharkdp/bat)" > $TGT; \
+echo "# Options for bat ($GITHUB/sharkdp/bat)" > $TGT; \
 echo -e "\n--pager='/usr/bin/less -iKMQRWX'" >> $TGT; \
 #
 # One can never have too many hex editors.
@@ -290,8 +290,8 @@ getGitHubAndLogVersion jetzerb $CMD; \
 cd $CMD; \
 dos2unix .tmux.conf*; : just in case \
 # add weather to the status line, and enable powerline glyphs
-sed -i -e '/^:.*navigation/{s/.*/# nix-nice# set terminal to "tmux" so we can have italics\nset -g default-terminal "tmux"\n&/;}' \
-       -e '/:tmux_conf_theme_.*_separator_/{s/^#//;}' \
+sed -i -e '/^#.*navigation/{s/.*/# nix-nice# set terminal to "tmux" so we can have italics\nset -g default-terminal "tmux"\n&/;}' \
+       -e '/#tmux_conf_theme_.*_separator_/{s/^#//;}' \
        -e '/tmux_conf_theme_status_right/{s/ / #{custom}/;}' \
        -e '/os_clipboard/{s/false/true/;}' \
 	.tmux.conf.local; \
@@ -314,7 +314,7 @@ mkdir -p $DIR; \
 wget -nv https://4e4.win/$CMD; \
 chmod +x $CMD; \
 echo 'cachedir=~/.local/share/'$CMD >> /etc/skel/.bashrc; : not using xdg, so this is cache dir; \
-echo 'complete -W "q=($cachedir/*/*; sed '"'s@\.md @ @g'"' <<<${q[@]:#*/})" tldr' >> /etc/skel/.bashrc; : auto complete for tldr; \
+echo 'complete -W "$(q=($cachedir/*/*); sed '"'s@\.md @ @g'"' <<<${q[@]##*/})" tldr' >> /etc/skel/.bashrc; : auto complete for tldr; \
 mv $CMD $DIR; \
 $DIR/$CMD --version | grep version >> $MANIFEST 2>&1; \
 #
