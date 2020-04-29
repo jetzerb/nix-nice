@@ -7,14 +7,18 @@ LABEL features="nix-nice dev, plus azure CLI with DevOps extension, and Azure Da
 LABEL access="SSH, key authentication, X11 forwarding"
 LABEL maintainer="jetzerb@sva.com"
 
-#
-# First layer: add pre-packaged software
-RUN \
+
 #
 # SOFTWARE INSTALL START
 #
+
+# Manifest file inside the container
+ARG MANIFEST=/opt/nix-nice/etc/manifest.txt
+
+#
+# First layer = various Ubuntu packages
+RUN \
 # make sure our manifest file exists
-MANIFEST=/opt/nix-nice/etc/manifest.txt; \
 mkdir -p $(dirname $MANIFEST); \
 echo "\n\n" >> $MANIFEST; \
 echo "Nix-Nice Azure Manifest:" |sed 'h; s/./-/g; p; x;' >> $MANIFEST; \
@@ -27,6 +31,10 @@ L=""; \
 P=""; \
 #
 # Now install the rest of the packages
+#
+#
+# Azure CLI pre-requisites
+P="$P libffi-dev"; \
 #
 # Azure Data Studio pre-requisites
 P="$P libxss1"; \
@@ -50,20 +58,18 @@ rm -rf /var/lib/apt/lists/*;
 RUN \
 #
 # prep work for additional apps
-MANIFEST=/opt/nix-nice/etc/manifest.txt; \
 TMP=/tmp/install; \
 mkdir -p $TMP; \
-
+#
 # Azure CLI
-# NOTE: tweak the sed script based on latest available package
+# NOTE: Not yet available for 20.04, so install latest version available
+#       and create a link to satisfy the libffi dependency
 curl -sL https://aka.ms/InstallAzureCLIDeb | sed 's/${CLI_REPO}/eoan/g;' | bash; \
-#
-# Now the DevOps extension to Azure CLI
-az extension add --name azure-devops; \
-az version >> $MANIFEST; \
+cd /lib/x86_64-linux-gnu; \
+ln -s libffi.so.7.1.0 libffi.so.6; \
 #
 #
-# Azure Data Studio (the new SSMS)
+# Azure Data Studio
 # (scrape the download page to make sure we get the latest version)
 cd $TMP; \
 CMD=azuredatastudio; \

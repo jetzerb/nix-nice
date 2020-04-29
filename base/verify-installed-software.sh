@@ -26,7 +26,10 @@ checkCommand() {
 }
 
 # ensure we're all set up properly
+export SHELL="$(command -v bash)";
 . /etc/profile;
+MYLOCALE=en_US.utf8 /opt/nix-nice/sbin/environment-setup.sh > /dev/null;
+
 
 dir=/tmp/test;
 mkdir -p "$dir" && cd "$dir";
@@ -47,6 +50,7 @@ checkInstall "tzdata";
 checkInstall "libxtst6";
 checkInstall "locales";
 
+mkdir /run/sshd;
 checkCommand 'openssh-server' 'sshd -t';
 
 checkInstall "xauth";
@@ -152,7 +156,7 @@ checkInstall 'rxvt-unicode'; # headless system; no GUI
 # no command, just files
 checkInstall 'fonts-dejavu';
 
-# **** xpdf not available in 20.04 yet checkInstall 'xpdf'; # headless system; no GUI
+checkInstall 'apvlv'; # headless system; no GUI
 
 
 
@@ -178,7 +182,7 @@ cmd="hexyl";   checkCommand "$cmd" '$cmd $csv';
 cmd="hecate";  checkCommand "$cmd" 'TERM=xterm "$cmd" "$csv" & kill %1;'
 
 cmd="vimrc";   checkCommand "$cmd" 'ls /etc/profile.d/vim_runtime/*${cmd}*';
-cmd=".tmux";   checkCommand "$cmd" 'ls /etc/skel/${cmd}*';
+cmd=".tmux";   checkCommand "$cmd" 'ls /etc/skel/${cmd}.conf{,.local} /etc/profile.d/tmux.conf';
 cmd="powerline fonts"; checkCommand "$cmd" 'ls /usr/share/fonts/truetype/dejavu/*owerline*';
 cmd="tldr";    checkCommand "$cmd" '$cmd $cmd';
 

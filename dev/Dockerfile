@@ -7,16 +7,20 @@ LABEL features="nix-nice base, plus git, vs code, dbeaver, postman"
 LABEL access="SSH, key authentication, X11 forwarding"
 LABEL maintainer="jetzerb@sva.com"
 
-#
-# First layer: add pre-packaged software
-RUN \
+
 #
 # SOFTWARE INSTALL START
 #
+
+# Manifest file inside the container
+ARG MANIFEST=/opt/nix-nice/etc/manifest.txt
+
+#
+# First layer = various Ubuntu packages
+RUN \
 # make sure our manifest file exists
-MANIFEST=/opt/nix-nice/etc/manifest.txt; \
 mkdir -p $(dirname $MANIFEST); \
-echo -e "\n\n" >> $MANIFEST; \
+echo "\n\n" >> $MANIFEST; \
 echo "Nix-Nice Developer Manifest:" |sed 'h; s/./-/g; p; x;' >> $MANIFEST; \
 #
 # Install the packages we want
@@ -80,10 +84,9 @@ rm -rf /var/lib/apt/lists/*;
 RUN \
 #
 # prep work for additional apps
-MANIFEST=/opt/nix-nice/etc/manifest.txt; \
 TMP=/tmp/install; \
-mkdir -p $TMP; \
 GITHUB=https://github.com; \
+mkdir -p $TMP; \
 L=""; \
 # Helper function:
 # clone a git repo, use latest commit ID as version, and remove ".git" dir
@@ -98,7 +101,7 @@ getGitHubAndLogVersion() { \
 # Fleck: a Clojure-like LISP that runs wherever Bash is
 cd $TMP; \
 CMD=flk; \
-DIR=/opt/$CMD/bin; \
+DIR=/opt/$CMD; \
 mkdir -p $DIR; \
 getGitHubAndLogVersion chr15m $CMD; \
 cp $CMD/$CMD $DIR; \
@@ -114,21 +117,35 @@ L="$L $CMD"; \
 #
 # DBeaver: Free Universal Database Tool
 cd $TMP; \
-CMD=dbeaver-ce; \
-wget https://$CMD.io/files/$CMD_latest_amd64.deb; \
+CMD=dbeaver; \
+wget https://$CMD.io/files/$CMD-ce_latest_amd64.deb; \
 dpkg -i $CMD*.deb; \
 rm $CMD*.deb; \
-L="$L $CMD"; \
+L="$L $CMD-ce"; \
 #
 # "universal" SQL access tool
 cd $TMP; \
 CMD=usql; \
-DIR=/opt/$CMD/bin; \
+DIR=/opt/$CMD; \
 mkdir -p $DIR; \
 URL=$GITHUB/xo/$CMD/releases; \
 wget $(lynx --dump $URL | sed -n '/https.*linux.*amd64/{s/.*https/https/; p; q;}'); \
 tar jxf $CMD*.bz2; \
 mv $CMD $DIR; \
+# link multiple versions to shared libraries so usql can run
+cd /lib/x86_64-linux-gnu; \
+for lib in $(find . -type f \( -name '*icuuc*' -o -name '*icui18n*' \)); \
+do \
+	lib=${lib#./}; \
+	tgt=${lib%.*}; \
+	cur=${tgt##*.}; \
+	for i in $(seq 5); \
+	do \
+		ver=$(( cur - i )); \
+		ln -s "$lib" $(echo "$tgt" | sed "s/$cur/$ver/;"); \
+	done; \
+done; \
+$DIR/$CMD -V >> $MANIFEST 2>&1; \
 #
 #
 # OSQuery: query your system using SQL
@@ -153,16 +170,14 @@ wget https://dl.pstmn.io/download/latest/linux64; \
 cd /opt; \
 tar zxf $TMP/linux64; \
 cd $CMD; \
-mkdir bin; \
-cd bin; \
-ln -s ../app/$CMD $(echo $CMD | sed 's/P/p/;'); \
-(cat ../app/version && echo) >> $MANIFEST; \
+ln -s $CMD $(echo $CMD | tr 'P' 'p'); \
+(cat app/version && echo) >> $MANIFEST; \
 rm $TMP/linux64; \
 #
 # and the CLI to drive postman
 CMD=newman; \
 npm install -g $CMD; \
-echo "$CMD $($CMD --version)" >> $MANIFEST; \
+echo "$CMD $($CMD --version)" >> $MANIFEST 2>&1; \
 #
 #
 # feature-rich bash prompt for git
@@ -179,34 +194,22 @@ ln -s /opt/$CMD/gitprompt.sh .; \
 cd $TMP; \
 CMD=diff-so-fancy; \
 getGitHubAndLogVersion so-fancy $CMD; \
-DIR=/opt/$CMD/bin; \
+DIR=/opt/$CMD; \
 mkdir -p $DIR; \
-mv $CMD/$CMD $DIR; \
+mv $CMD/$CMD $CMD/lib $DIR; \
 chmod 755 $DIR/$CMD; \
 #
 #
 # clean up after software downloads
 cd /tmp; \
 rm -rf $TMP; \
-dpkg -l $L >> $MANIFEST; \
+dpkg -l $L >> $MANIFEST 2>&1; \
 #
 #
 # system-wide settings for git
 # Settings for diff-so-fancy:
 git config --system core.pager "diff-so-fancy | less"; \
-git config --system color.ui true; \
-#
-git config --system color.diff-highlight.oldNormal    "red bold"; \
-git config --system color.diff-highlight.oldHighlight "red bold 52"; \
-git config --system color.diff-highlight.newNormal    "green bold"; \
-git config --system color.diff-highlight.newHighlight "green bold 22"; \
-#
-git config --system color.diff.meta       "yellow"; \
-git config --system color.diff.frag       "magenta bold"; \
-git config --system color.diff.commit     "yellow bold"; \
-git config --system color.diff.old        "red bold"; \
-git config --system color.diff.new        "green bold"; \
-git config --system color.diff.whitespace "red reverse"; \
+diff-so-fancy --colors | sed 's/--global/--system/;' |sh ;\
 #
 # other settings
 git config --system core.filemode false; : so git ignores access mode between windows and linux; \

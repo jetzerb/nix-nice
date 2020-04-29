@@ -1,0 +1,307 @@
+
+
+---------------
+Command: tzdata
+OK
+
+
+-----------------
+Command: libxtst6
+OK
+
+
+----------------
+Command: locales
+OK
+
+
+-----------------------
+Command: openssh-server
+OK
+
+
+--------------
+Command: xauth
+OK
+
+
+------------------------
+Command: ca-certificates
+OK
+
+
+--------------
+Command: gnupg
+gpg: directory '/root/.gnupg' created
+gpg: keybox '/root/.gnupg/pubring.kbx' created
+OK
+
+
+--------------
+Command: rsync
+OK
+
+
+-----------------
+Command: dbus-x11
+OK
+
+
+---------------------
+Command: at-spi2-core
+OK
+
+
+-------------
+Command: yank
+OK
+
+
+--------------
+Command: xclip
+OK
+
+
+----------------
+Command: httping
+OK
+
+
+-------------
+Command: ping
+OK
+
+
+----------------
+Command: busybox
+OK
+
+
+-------------
+Command: less
+OK
+
+
+------------------
+Command: coreutils
+OK
+
+
+-------------
+Command: tree
+OK
+
+
+------------------
+Command: diffutils
+OK
+
+
+------------------
+Command: colordiff
+OK
+
+
+-------------
+Command: bash
+OK
+
+
+------------------------
+Command: bash-completion
+OK
+
+
+-------------
+Command: perl
+OK
+
+
+------------
+Command: zip
+OK
+
+
+---------------
+Command: neovim
+OK
+
+
+-------------
+Command: tmux
+OK
+
+
+---------------------
+Command: ncurses-term
+OK
+
+
+-------------
+Command: sudo
+OK
+
+
+-----------------
+Command: xsltproc
+OK
+
+
+-----------
+Command: jq
+OK
+
+
+-------------
+Command: wget
+OK
+
+
+-------------
+Command: curl
+OK
+
+
+-------------
+Command: meld
+OK
+
+
+-----------------
+Command: parallel
+OK
+
+
+-----------------
+Command: ministat
+OK
+
+
+--------------------
+Command: imagemagick
+OK
+
+
+----------------
+Command: gnuplot
+OK
+
+
+----------------------
+Command: poppler-utils
+OK
+
+
+-------------
+Command: ddgr
+OK
+
+
+------------
+Command: nnn
+OK
+
+
+-------------
+Command: lynx
+OK
+
+
+-----------
+Command: sc
+OK
+
+
+---------------------
+Command: rxvt-unicode
+OK
+
+
+---------------------
+Command: fonts-dejavu
+OK
+
+
+--------------
+Command: apvlv
+OK
+
+
+---------------
+Command: toybox
+OK
+
+
+----------------
+Command: bitwise
+OK
+
+
+----------------
+Command: ripgrep
+OK
+
+
+------------
+Command: xsv
+OK
+
+
+-------------
+Command: gron
+OK
+
+
+---------------
+Command: trdsql
+OK
+
+
+------------
+Command: bat
+OK
+
+
+-----------
+Command: fd
+OK
+
+
+--------------
+Command: hexyl
+OK
+
+
+---------------
+Command: hecate
+OK
+
+
+--------------
+Command: vimrc
+OK
+
+
+--------------
+Command: .tmux
+OK
+
+
+------------------------
+Command: powerline fonts
+OK
+
+
+-------------
+Command: tldr
+OK
+
+
+------------
+Command: fzf
+OK
+
+
+-----------------
+Command: nix-nice
+OK

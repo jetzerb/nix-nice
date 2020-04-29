@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+IFS=$'\n\t';
+set -euo pipefail;
+
+repo=$(basename $(git rev-parse --show-toplevel));
+
+# if called with any commandline argument, assume the caller wants the
+# user name as well
+if [ -n "${1:-}" ]
+then
+	# assume github URL format: https://github.com/user/repo
+	user="$(git remote -v | awk -F '/' '/push/ {print $4; exit;}')";
+	repo="$user/$repo";
+fi;
+
+echo "$repo";
