@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Add UTF-8 Byte Order Markers to files
+# (to make Visual Studio happy)
+bom='\xef\xbb\xbf';
+
+sed -i -f - "$@" <<SED_SCRIPT
+/^$bom/ { b; }
+1 { s/^/$bom/; }
+SED_SCRIPT

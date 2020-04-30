@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# Remove UTF-8 Byte Order Markers from files
+bom='\xef\xbb\xbf';
+
+sed -i -f - "$@" <<SED_SCRIPT
+1 { s/^$bom//; }
+SED_SCRIPT
