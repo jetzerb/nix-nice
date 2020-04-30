@@ -145,8 +145,8 @@ Command: bash-git-prompt
 OK
 
 
-----------------------
-Command: diff-so-fancy
+--------------
+Command: delta
 OK
 
 

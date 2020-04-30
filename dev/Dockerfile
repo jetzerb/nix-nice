@@ -110,7 +110,7 @@ chmod +x $DIR/$CMD; \
 # VS Code: Code Editor
 cd $TMP; \
 CMD=code; \
-wget -O $CMD.deb https://go.microsoft.com/fwlink/?LinkID=760868; \
+wget -nv -O $CMD.deb https://go.microsoft.com/fwlink/?LinkID=760868; \
 dpkg -i $CMD.deb; \
 rm $CMD.deb; \
 L="$L $CMD"; \
@@ -118,7 +118,7 @@ L="$L $CMD"; \
 # DBeaver: Free Universal Database Tool
 cd $TMP; \
 CMD=dbeaver; \
-wget https://$CMD.io/files/$CMD-ce_latest_amd64.deb; \
+wget -nv https://$CMD.io/files/$CMD-ce_latest_amd64.deb; \
 dpkg -i $CMD*.deb; \
 rm $CMD*.deb; \
 L="$L $CMD-ce"; \
@@ -129,22 +129,14 @@ CMD=usql; \
 DIR=/opt/$CMD; \
 mkdir -p $DIR; \
 URL=$GITHUB/xo/$CMD/releases; \
-wget $(lynx --dump $URL | sed -n '/https.*linux.*amd64/{s/.*https/https/; p; q;}'); \
+wget -nv $(lynx --dump $URL | sed -n '/https.*linux.*amd64/{s/.*https/https/; p; q;}'); \
 tar jxf $CMD*.bz2; \
 mv $CMD $DIR; \
 # link multiple versions to shared libraries so usql can run
 cd /lib/x86_64-linux-gnu; \
-for lib in $(find . -type f \( -name '*icuuc*' -o -name '*icui18n*' \)); \
-do \
-	lib=${lib#./}; \
-	tgt=${lib%.*}; \
-	cur=${tgt##*.}; \
-	for i in $(seq 5); \
-	do \
-		ver=$(( cur - i )); \
-		ln -s "$lib" $(echo "$tgt" | sed "s/$cur/$ver/;"); \
-	done; \
-done; \
+EXE="/opt/nix-nice/sbin/make-lib-links"; \
+"$EXE" ./libicuuc; \
+"$EXE" ./libicui18n; \
 $DIR/$CMD -V >> $MANIFEST 2>&1; \
 #
 #
@@ -152,7 +144,7 @@ $DIR/$CMD -V >> $MANIFEST 2>&1; \
 cd $TMP; \
 CMD=osquery; \
 URL=$GITHUB/$CMD/$CMD/releases; \
-wget -O $CMD.deb $(lynx --dump $URL | sed -n '/[0-9][0-9]*\. https.*deb/ {s/.*https/https/; p; q;}'); \
+wget -nv -O $CMD.deb $(lynx --dump $URL | sed -n '/[0-9][0-9]*\. https.*deb/ {s/.*https/https/; p; q;}'); \
 dpkg -i $CMD.deb; \
 L="$L $CMD"; \
 #
@@ -166,7 +158,7 @@ getGitHubAndLogVersion djrobstep $CMD; \
 # Postman: API Development Environment
 CMD=Postman; \
 cd $TMP; \
-wget https://dl.pstmn.io/download/latest/linux64; \
+wget -nv https://dl.pstmn.io/download/latest/linux64; \
 cd /opt; \
 tar zxf $TMP/linux64; \
 cd $CMD; \
@@ -190,14 +182,13 @@ sed -i '/Blue}/ { s/{Blue}/{Cyan}/g; s/{DimBlue}/{DimCyan}/g; }' Default.bgpthem
 cd /etc/profile.d; \
 ln -s /opt/$CMD/gitprompt.sh .; \
 #
-# fancier git diff output
+# delta for diff & git diff syntax highlighting
 cd $TMP; \
-CMD=diff-so-fancy; \
-getGitHubAndLogVersion so-fancy $CMD; \
-DIR=/opt/$CMD; \
-mkdir -p $DIR; \
-mv $CMD/$CMD $CMD/lib $DIR; \
-chmod 755 $DIR/$CMD; \
+CMD=delta; \
+URL=$GITHUB/dandavison/$CMD/releases; \
+wget -nv -O $CMD.deb $(lynx --dump $URL | sed -n '/musl/d; /[0-9][0-9]*\. https.*amd64.*deb/ {s/.*https/https/; p; q;}'); \
+dpkg -i $CMD.deb; \
+L="$L git-$CMD"; \
 #
 #
 # clean up after software downloads
@@ -207,9 +198,9 @@ dpkg -l $L >> $MANIFEST 2>&1; \
 #
 #
 # system-wide settings for git
-# Settings for diff-so-fancy:
-git config --system core.pager "diff-so-fancy | less"; \
-diff-so-fancy --colors | sed 's/--global/--system/;' |sh ;\
+# Settings for delta
+git config --system core.pager 'delta --plus-color="#003400" --minus-color="#340000" --theme='"'Monokai Extended'"; \
+git config --system interactive.diffFilter 'delta --color-only'; \
 #
 # other settings
 git config --system core.filemode false; : so git ignores access mode between windows and linux; \
