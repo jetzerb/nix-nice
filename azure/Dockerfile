@@ -65,8 +65,7 @@ mkdir -p $TMP; \
 # NOTE: Not yet available for 20.04, so install latest version available
 #       and create a link to satisfy the libffi dependency
 curl -sL https://aka.ms/InstallAzureCLIDeb | sed 's/${CLI_REPO}/eoan/g;' | bash; \
-cd /lib/x86_64-linux-gnu; \
-ln -s libffi.so.7.1.0 libffi.so.6; \
+/opt/nix-nice/sbin/make-lib-links /lib/x86_64-linux-gnu/libffi; \
 #
 #
 # Azure Data Studio
@@ -74,7 +73,7 @@ ln -s libffi.so.7.1.0 libffi.so.6; \
 cd $TMP; \
 CMD=azuredatastudio; \
 lynx --dump https://docs.microsoft.com/en-us/sql/azure-data-studio/download > download_page; \
-wget -O ${CMD}.deb $( \
+wget -nv -O ${CMD}.deb $( \
 	awk '/\[[0-9]+\]\.deb/ {gsub("[^0-9]",""); LINK="^ +" $0 "\. https";} \
 	     /^References$/ {INREFS=1;} \
 	     INREFS == 1 && $0 ~ LINK {print $2;}' download_page); \
