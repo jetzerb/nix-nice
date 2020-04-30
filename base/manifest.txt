@@ -73,8 +73,42 @@ Desired=Unknown/Install/Remove/Purge/Hold
 |/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
 ||/ Name           Version      Architecture Description
 +++-==============-============-============-=============================================================================
-ii  bat            0.14.0       amd64        A cat(1) clone with wings.
+ii  bat            0.15.0       amd64        A cat(1) clone with wings.
 ii  fd             8.0.0        amd64        Simple, fast and user-friendly alternative to find
 ii  hecate         0.0.1        amd64        ?
 ii  hexyl          0.7.0        amd64        A command-line hex viewer.
 ii  ripgrep        12.0.1       amd64        ripgrep is a line-oriented search tool that recursively searches your current
+
+
+
+----------------------
+Defaults For New Users
+d41d8cd98f00b204e9800998ecf8427e  /etc/skel/.Xauthority
+f0dc05aef8d25ef9235660b9f2f497c9  /etc/skel/.Xdefaults
+22bfb8c1dd94b5f3813a2b25da67463f  /etc/skel/.bash_logout
+aa39a5e2e2603394797b9481a66ef455  /etc/skel/.bashrc
+62747c19dbc892a1048f660fd8b08bf7  /etc/skel/.config/bat/config
+6eabaca0699a81a8976bab69d1128b98  /etc/skel/.config/nvim/init.vim
+35f54adf5f3ba197c9f9e7ad6414b81a  /etc/skel/.config/nvim/my_configs.vim
+ab632379e55322293328cbfaa0916af6  /etc/skel/.config/rsync/my_excludes
+8f1a5b1a1aee9364ab8dddb00b9bfb16  /etc/skel/.config/trdsql/config.json
+118a49c760f3c2829d788f7e47fbfb2b  /etc/skel/.profile
+fe6d596fc005c64730d6d44deb7107db  /etc/skel/.tmux.conf.local
+
+
+
+--------------------
+Nix-Nice Executables
+b47931b94bd3219734b11afeb1ffc279  /opt/nix-nice/bin/cb.sh
+262331ea901ced3c2b52ee7645ff9024  /opt/nix-nice/bin/cmphost.sh
+014025bff643a37f1b0992133866e857  /opt/nix-nice/bin/finalnewline.sh
+c492adf682546250125faf50a8956e06  /opt/nix-nice/bin/rgbat.sh
+0a4cce7f36cc2945ef0dd50b6d4b0ca8  /opt/nix-nice/bin/urlencode.sh
+2231e27289ac42f5af576cd431f1011a  /opt/nix-nice/etc/manifest.txt
+c114c8646052e49c45065cd2165ef54a  /opt/nix-nice/etc/persistfs-files
+99bc826296648cd70d69fcbde10ed1c0  /opt/nix-nice/sbin/container-startup.sh
+e52f1985db56e490f481bf76bcc9d574  /opt/nix-nice/sbin/create-links.sh
+b4019911b8e5ed90e0103e5f463993b5  /opt/nix-nice/sbin/create-users.sh
+cf899ce25ccbaa6d795512082a27e94a  /opt/nix-nice/sbin/environment-setup.sh
+f4634a0aaa0e62a95f0ae897fc064a6c  /opt/nix-nice/sbin/make-lib-links
+888178d651a30dc243ce07fe02b00ed3  /opt/nix-nice/sbin/persistfs-sync.sh

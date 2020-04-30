@@ -3,4 +3,7 @@
 # clean up after ourselves
 rm -rf fs;
 
+# run tests
+./test-container.sh
+
 echo "Post-Build Hook End DateTime: $(date)";

@@ -73,7 +73,7 @@ Desired=Unknown/Install/Remove/Purge/Hold
 |/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
 ||/ Name           Version      Architecture Description
 +++-==============-============-============-=============================================================================
-ii  bat            0.14.0       amd64        A cat(1) clone with wings.
+ii  bat            0.15.0       amd64        A cat(1) clone with wings.
 ii  fd             8.0.0        amd64        Simple, fast and user-friendly alternative to find
 ii  hecate         0.0.1        amd64        ?
 ii  hexyl          0.7.0        amd64        A command-line hex viewer.
@@ -107,9 +107,9 @@ ii  python3-wheel        0.34.2-1              all          built-package format
 ii  shellcheck           0.7.0-2build2         amd64        lint tool for shell scripts
 ii  sqitch               0.9999-2              all          sane database change management
 ii  sqlite3              3.31.1-4              amd64        Command line interface for SQLite 3
-flk - b87f67d - 2020-04-24 11:58:05 +0800
+flk - 71e9710 - 2020-04-29 21:08:27 +0800
 usql 0.7.8
-migra - d6aeb31 - 2020-04-18 22:44:40 +1000
+migra - c44627f - 2020-04-23 11:23:54 +1000
 v3.1.8-postman.5
 newman 5.0.0
 bash-git-prompt - 148d502 - 2019-11-17 07:17:07 -0500
@@ -150,14 +150,14 @@ Defaults For New Users
 d41d8cd98f00b204e9800998ecf8427e  /etc/skel/.Xauthority
 f0dc05aef8d25ef9235660b9f2f497c9  /etc/skel/.Xdefaults
 22bfb8c1dd94b5f3813a2b25da67463f  /etc/skel/.bash_logout
-df5e20ae25e5e468d97a1ef4d8f169b2  /etc/skel/.bashrc
-c6d598b15ba1f58b1aec4c65e938a746  /etc/skel/.config/bat/config
+aa39a5e2e2603394797b9481a66ef455  /etc/skel/.bashrc
+62747c19dbc892a1048f660fd8b08bf7  /etc/skel/.config/bat/config
 6eabaca0699a81a8976bab69d1128b98  /etc/skel/.config/nvim/init.vim
 35f54adf5f3ba197c9f9e7ad6414b81a  /etc/skel/.config/nvim/my_configs.vim
 ab632379e55322293328cbfaa0916af6  /etc/skel/.config/rsync/my_excludes
 8f1a5b1a1aee9364ab8dddb00b9bfb16  /etc/skel/.config/trdsql/config.json
 118a49c760f3c2829d788f7e47fbfb2b  /etc/skel/.profile
-d3b0b939c41a2afad0abcb7906288fdf  /etc/skel/.tmux.conf.local
+fe6d596fc005c64730d6d44deb7107db  /etc/skel/.tmux.conf.local
 
 
 
@@ -181,12 +181,13 @@ c492adf682546250125faf50a8956e06  /opt/nix-nice/bin/rgbat.sh
 2656f5a66f744b29f38bf40946f980df  /opt/nix-nice/bin/ssisversioncheck.sh
 a886f411fb0fe2f1d21a1d4236d71881  /opt/nix-nice/bin/submodsetup.sh
 0a4cce7f36cc2945ef0dd50b6d4b0ca8  /opt/nix-nice/bin/urlencode.sh
-1c4ec0b9e16cf98d396751d5b07df13a  /opt/nix-nice/etc/manifest.txt
+7d608a9f3e7b9a7c9345a399916672b5  /opt/nix-nice/etc/manifest.txt
 c114c8646052e49c45065cd2165ef54a  /opt/nix-nice/etc/persistfs-files
 99bc826296648cd70d69fcbde10ed1c0  /opt/nix-nice/sbin/container-startup.sh
 e52f1985db56e490f481bf76bcc9d574  /opt/nix-nice/sbin/create-links.sh
 b4019911b8e5ed90e0103e5f463993b5  /opt/nix-nice/sbin/create-users.sh
 cf899ce25ccbaa6d795512082a27e94a  /opt/nix-nice/sbin/environment-setup.sh
+f4634a0aaa0e62a95f0ae897fc064a6c  /opt/nix-nice/sbin/make-lib-links
 888178d651a30dc243ce07fe02b00ed3  /opt/nix-nice/sbin/persistfs-sync.sh
 
 

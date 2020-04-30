@@ -138,11 +138,12 @@ do \
 	echo "Creating links for $EXE:"; \
 	for CMD in $($LIST); \
 	do \
+		[ -f "/$CMD" ] && continue; \
 		BASECMD=${CMD##*/}; \
 		case "$(type $BASECMD 2>&1)" in \
 			*"not found"*) \
 				echo "	$CMD"; \
-				ln -s $EXE /$CMD; \
+				ln -s $EXE /"$CMD"; \
 				;; \
 		esac; \
 	done; \
@@ -241,8 +242,8 @@ done; \
 TGT=/etc/skel/.config/bat; \
 mkdir -p $TGT; \
 TGT=$TGT/config; \
-echo ": Options for bat ($GITHUB/sharkdp/bat)" > $TGT; \
-echo -e "\n--pager='/usr/bin/less -iKMQRWX'" >> $TGT; \
+echo "# Options for bat ($GITHUB/sharkdp/bat)" > $TGT; \
+echo "\n--pager='/usr/bin/less -iKMQRWX'" >> $TGT; \
 #
 # One can never have too many hex editors.
 cd $TMP; \
@@ -288,16 +289,15 @@ cd $TMP; \
 CMD=.tmux; \
 getGitHubAndLogVersion jetzerb $CMD; \
 cd $CMD; \
-dos2unix .tmux.conf*; : just in case \
-# add weather to the status line, and enable powerline glyphs
-sed -i -e '/^:.*navigation/{s/.*/# nix-nice# set terminal to "tmux" so we can have italics\nset -g default-terminal "tmux"\n&/;}' \
-       -e '/:tmux_conf_theme_.*_separator_/{s/^#//;}' \
-       -e '/tmux_conf_theme_status_right/{s/ / #{custom}/;}' \
+# add weather to the status line, and enable powerline glyphs and OS clipboard integration
+sed -i -e '/^#.*navigation/{s/.*/# nix-nice: set terminal to "tmux" so we can have italics\nset -g default-terminal "tmux"\n&/;}' \
+       -e '/#tmux_conf_theme_.*_separator_/{s/^#//;}' \
+       -e '/tmux_conf_theme_status_right=/{s/ / #{custom}/;}' \
        -e '/os_clipboard/{s/false/true/;}' \
-	.tmux.conf.local; \
-cp .tmux.conf /etc/profile.d/tmux.conf; \
-ln -s /etc/profile.d/tmux.conf /etc/skel/.tmux.conf; \
-cp .tmux.conf.local /etc/skel; \
+	${CMD}.conf.local; \
+cp ${CMD}.conf /etc/profile.d/tmux.conf; \
+ln -s /etc/profile.d/tmux.conf /etc/skel/${CMD}.conf; \
+cp ${CMD}.conf.local /etc/skel; \
 #
 # Overlay powerline fonts
 cd $TMP; \
@@ -314,7 +314,7 @@ mkdir -p $DIR; \
 wget -nv https://4e4.win/$CMD; \
 chmod +x $CMD; \
 echo 'cachedir=~/.local/share/'$CMD >> /etc/skel/.bashrc; : not using xdg, so this is cache dir; \
-echo 'complete -W "q=($cachedir/*/*; sed '"'s@\.md @ @g'"' <<<${q[@]:#*/})" tldr' >> /etc/skel/.bashrc; : auto complete for tldr; \
+echo 'complete -W "$(q=($cachedir/*/*); sed '"'s@\.md @ @g'"' <<<${q[@]##*/})" tldr' >> /etc/skel/.bashrc; : auto complete for tldr; \
 mv $CMD $DIR; \
 $DIR/$CMD --version | grep version >> $MANIFEST 2>&1; \
 #
@@ -324,7 +324,7 @@ cd /opt; \
 getGitHubAndLogVersion junegunn $CMD; \
 cd $CMD; \
 find . -type f -exec dos2unix {} \; ; : just in case; \
-echo -e "n\nn\nn\n" |./install; : answer no to the three questions asked; \
+echo "n\nn\nn\n" |./install; : answer no to the three questions asked; \
 #
 # cleanup
 apt-get remove -yq --purge $BUILDPKGS; \

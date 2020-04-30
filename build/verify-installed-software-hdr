@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+
+# Context for the unit tests / verification routines
+#
+# This will be prepended to the scripts that are run inside of the container.
+
+
+#
+# --------------------------------------------------
+# Helper functions
+
+
+#
+# Function to spit out a header for the output of a test
+printHdr () {
+	echo -e "\nCommand: $1" |sed 'h; s/./-/g; p; x;';
+};
+
+#
+# Some apps can't be validated via code execution because we're running a
+# script without a TTY or a GUI.  In those cases, just check that the package
+# is installed
+checkInstall() {
+	printHdr "$1";
+	dpkg -l "$1" \
+	| awk '
+		BEGIN {msg = "ERROR: Package Not Installed!";}
+		/^ii/ {msg = "OK";}
+		END {print msg;}';
+};
+
+#
+# Verify an installation by running a command and returning a status indicator
+checkCommand() (
+	printHdr "$1";
+	eval "$2"  > /dev/null && echo "OK" || echo "ERROR";
+);
+
+
+#
+# --------------------------------------------------
+# Environment setup
+
+#
+# ensure we're all set up properly
+SHELL="$(command -v bash)";
+export SHELL;
+
+. /etc/profile;
+MYLOCALE=en_US.utf8 /opt/nix-nice/sbin/environment-setup.sh > /dev/null;
+
+
+dir="$(mktemp -d)";
+mkdir -p "$dir" && cd "$dir" || exit;
+
+# sample CSV file used in multiple tests
+csv=test.csv;
+echo -e 'a,b,c,d\n1,2,3,4' > "$csv";
+
+
