@@ -11,19 +11,34 @@
 # commandline editing using vi mode
 set -o vi;
 
+prependPath () {
+	[ "$PATH" = "${PATH#*$1}" ] && export PATH="$1:$PATH";
+}
 
 # Include 3rd party exe paths and tab completion
-for myDIR in /opt/* $HOME/bin $HOME/.local/bin
+for myDIR in /opt/*
 do
 	[ -d "$myDIR" ] || continue;
 	for myFILE in "$myDIR"/*.completion
 	do
 		[ -f "$myFILE" ] && . "$myFILE";
 	done;
-	[ -d "$myDIR/bin" ] && myDIR="$myDIR/bin";
-	[ "$PATH" = "${PATH#*$myDIR}" ] && export PATH="$myDIR:$PATH";
+	myFound=;
+	for myBIN in /bin /sbin ""
+	do
+		myPATH="$myDIR$myBIN";
+		if [ -d "$myPATH" ]
+		then
+			# don't add base path if already added bin and/or sbin
+			[ -n "$myFound" ] && [ -z "$myBIN" ] && continue;
+			myFound=1;
+			prependPath "$myPATH";
+		fi;
+	done;
 done;
-unset myDIR myFILE;
+unset myDIR myFILE myPATH myBIN;
+prependPath "$HOME/bin";
+prependPath "$HOME/.local/bin";
 
 
 # colorful directory listings
@@ -70,6 +85,12 @@ unset myCMD;
 
 # I like vi
 myCMD="$(command -v vi)";
+# if it's aliased, pull out the executable
+case "$myCMD" in
+	"alias vi="*)
+		myCMD="${myCMD#*=\'}";
+		myCMD="${myCMD%\'}";;
+esac;
 if [ -n "$myCMD" ]
 then
 	export VISUAL="$myCMD";
@@ -91,6 +112,7 @@ pushd . >/dev/null;
 IFS=':' read -ra myDIRS <<< "$PATH";
 for myDIR in "${myDIRS[@]}"
 do
+	[ -d "$myDIR" ] || continue;
 	cd "$myDIR" || continue;
 	for myCMD in $(/bin/ls -1f ./*.sh 2>/dev/null)
 	do
@@ -100,6 +122,23 @@ do
 done;
 unset myDIRS myDIR myCMD;
 popd >/dev/null || echo "Unable to pop directory";
+
+
+#
+# function to print a nice header.  frequently comes in handy
+mkhdr() {
+	echo "$*" | sed '{h; s/./-/g; s/^/\n\n/; p; x;}';
+}
+
+#
+# function to center a string of text.
+center() {
+	line="${1:-}";
+	echo "$line" | pr -To $(( (${2:-80} - ${#line}) / 2 ));
+}
+
+#
+# function to center a string of text
 
 #
 # cd up a few directories

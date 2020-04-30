@@ -226,7 +226,8 @@ cd $CMD*linux*; \
 mv $CMD $DIR; \
 mv README.md $(dirname $DIR); \
 mkdir -p /etc/skel/.config/$CMD; \
-mv config.json.sample /etc/skel/.config/$CMD/config.json; \
+# copy sample config file, but ensure it uses sqlite by default
+sed '/"db":/ {s/"pdb"/"sdb"/;}' config.json.sample > /etc/skel/.config/$CMD/config.json; \
 echo "$CMD $($DIR/$CMD --version)" >> $MANIFEST 2>&1; \
 #
 # Install bat (pager w/syntax highlighting and git integration; can be used as replacement for cat)
@@ -293,6 +294,7 @@ cd $CMD; \
 sed -i -e '/^#.*navigation/{s/.*/# nix-nice: set terminal to "tmux" so we can have italics\nset -g default-terminal "tmux"\n&/;}' \
        -e '/#tmux_conf_theme_.*_separator_/{s/^#//;}' \
        -e '/tmux_conf_theme_status_right=/{s/ / #{custom}/;}' \
+       -e '/tmux_conf_battery_status_charging=.*26A1/{s/^#//;}' \
        -e '/os_clipboard/{s/false/true/;}' \
 	${CMD}.conf.local; \
 cp ${CMD}.conf /etc/profile.d/tmux.conf; \

@@ -24,11 +24,13 @@ URxvt*font:            xft:mono:pixelsize=14:antialias=true:hinting=true
 URxvt*boldFont:        xft:mono:pixelsize=14:antialias=true:hinting=true:bold
 URxvt*italicFont:      xft:mono:pixelsize=14:antialias=true:hinting=true:oblique
 URxvt*boldItalicFont:  xft:mono:pixelsize=14:antialias=true:hinting=true:bold:oblique
+! Letter spacing can be too wide; you may need to squish them somewhat
+URxvt*letterSpace:     -1.5
 !
-! let tmux handle scrollback; uncomment these lines if you don't use tmux
+! let tmux handle scrollback; uncomment and configure these lines if you don't use tmux
 !URxvt*saveLines:       12000
 !URxvt*scrollBar:       true
-URxvt*scrollBar:       false
+!URxvt*scrollBar:       false
 !URxvt*scrollBar_right: false
 !URxvt*scrollstyle:     next
 !
@@ -36,6 +38,6 @@ URxvt*scrollBar:       false
 URxvt*cursorBlink:     true
 URxvt*cursorUnderline: true
 !
-! Assume we have the font-size perl extension enabled, from
-! https://github.com/majutsushi/urxvt-font-size
+! urxvt comes bundled with several perl extensions (see output of
+! "dpkg -L rxvt-unicode").  Take advantage of whichever you like here:
 URxvt.perl-ext-common: font-size
