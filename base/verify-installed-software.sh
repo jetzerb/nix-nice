@@ -142,12 +142,15 @@ cmd="hexyl";   checkCommand "$cmd" '$cmd $csv';
 # or how to snag the screen...
 cmd="hecate";  checkCommand "$cmd" 'TERM=xterm "$cmd" "$csv" & kill %1;'
 
+cmd="bat-extras";      checkCommand "$cmd" 'ls /opt/"$cmd"/bin/{bat,pretty}* && batgrep "." "$csv"';
 cmd="vimrc";   checkCommand "$cmd" 'dir=/etc/profile.d/vim_runtime; ls $dir/*${cmd}* && ls $dir/zz*';
 cmd=".tmux";   checkCommand "$cmd" '[ -f "$(realpath /etc/skel/${cmd}.conf)" ] && grep "os_clipboard=true" /etc/skel/${cmd}.conf.local';
 cmd="powerline fonts"; checkCommand "$cmd" 'ls /usr/share/fonts/truetype/dejavu/*owerline*';
 cmd="tldr";    checkCommand "$cmd" '$cmd $cmd && grep '"'"'^complete.*$(q=.*<<<.*##.*'"'"'"$cmd" /etc/skel/.bashrc';
 
 cmd='fzf';     checkCommand "$cmd" '$cmd --version';
+
+cmd='env vars' checkCommand "$cmd" 'grep TMPDIR /etc/environment';
 
 # spot-check files copied in
 cmd='nix-nice'; checkCommand "$cmd" 'readlink /opt/$cmd/bin/gethost.sh';

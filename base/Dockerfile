@@ -262,9 +262,22 @@ getGitHubAndLogVersion() { \
 	git clone --depth 1 https://github.com/$1/${2}.git; \
 	cd $2; \
 	echo "$2 - $(git log --format='%h - %ai')" >> $MANIFEST 2>&1; \
+	git submodule init; \
+	git submodule sync --recursive; \
+	git submodule update --recursive; \
 	rm -rf .git; \
 	cd ..; \
 }; \
+#
+# Install extensions for the `bat` pager
+cd $TMP; \
+CMD=bat-extras; \
+getGitHubAndLogVersion eth-p $CMD; \
+cd $CMD; \
+mkdir -p /opt/$CMD/bin; \
+export TMPDIR=/tmp; \
+export TERM=dumb; \
+./build.sh --install --prefix=/opt/$CMD; \
 #
 # Install "The Ultimate Vim Configuration"
 cd $TMP; \
@@ -341,6 +354,8 @@ makeToyAndBusyBoxLinks; \
 #
 #
 # Configure the stuff we just installed
+#
+grep TMPDIR /etc/environment || echo "TMPDIR=/tmp" >> /etc/environment; \
 #
 # ubuntu auto-generates server keys for SSH;
 # just need to turn on X11 forwarding for remote clients and work around

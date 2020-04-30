@@ -63,6 +63,7 @@ bitwise v0.41
 xsv 0.13.0
 gron version 0.6.0
 trdsql trdsql version v0.7.5
+bat-extras - bad5ab1 - 2020-04-27 19:09:59 -0700
 vimrc - 31256d6 - 2020-04-16 10:47:00 +0800
 .tmux - 2e40091 - 2020-04-21 14:56:12 -0500
 fonts - e80e3eb - 2018-11-11 15:22:30 +0300
@@ -104,7 +105,7 @@ b47931b94bd3219734b11afeb1ffc279  /opt/nix-nice/bin/cb.sh
 014025bff643a37f1b0992133866e857  /opt/nix-nice/bin/finalnewline.sh
 c492adf682546250125faf50a8956e06  /opt/nix-nice/bin/rgbat.sh
 0a4cce7f36cc2945ef0dd50b6d4b0ca8  /opt/nix-nice/bin/urlencode.sh
-2231e27289ac42f5af576cd431f1011a  /opt/nix-nice/etc/manifest.txt
+af02913189bb14da1c792159421162dc  /opt/nix-nice/etc/manifest.txt
 c114c8646052e49c45065cd2165ef54a  /opt/nix-nice/etc/persistfs-files
 99bc826296648cd70d69fcbde10ed1c0  /opt/nix-nice/sbin/container-startup.sh
 e52f1985db56e490f481bf76bcc9d574  /opt/nix-nice/sbin/create-links.sh

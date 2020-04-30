@@ -277,6 +277,11 @@ Command: hecate
 OK
 
 
+-------------------
+Command: bat-extras
+OK
+
+
 --------------
 Command: vimrc
 OK
@@ -294,6 +299,11 @@ OK
 
 -------------
 Command: tldr
+OK
+
+
+------------
+Command: fzf
 OK
 
 
