@@ -76,7 +76,7 @@ cmd="newman";  checkCommand "$cmd" '$cmd run $collectionFile';
 
 checkCommand "bash-git-prompt" 'git_prompt_list_themes';
 
-cmd="diff-so-fancy"; checkCommand "$cmd" 'echo $cmd | $cmd';
+cmd="delta";   checkCommand "$cmd" 'diff -u <(echo foo) <(echo bar) | $cmd';
 
 dir="/etc/profile.d/vim_runtime";
 checkCommand "vimrc" '[ -d "$dir" ] && [ ! -d "$dir"/zz* ]'

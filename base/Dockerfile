@@ -226,7 +226,8 @@ cd $CMD*linux*; \
 mv $CMD $DIR; \
 mv README.md $(dirname $DIR); \
 mkdir -p /etc/skel/.config/$CMD; \
-mv config.json.sample /etc/skel/.config/$CMD/config.json; \
+# copy sample config file, but ensure it uses sqlite by default
+sed '/"db":/ {s/"pdb"/"sdb"/;}' config.json.sample > /etc/skel/.config/$CMD/config.json; \
 echo "$CMD $($DIR/$CMD --version)" >> $MANIFEST 2>&1; \
 #
 # Install bat (pager w/syntax highlighting and git integration; can be used as replacement for cat)
@@ -261,9 +262,22 @@ getGitHubAndLogVersion() { \
 	git clone --depth 1 https://github.com/$1/${2}.git; \
 	cd $2; \
 	echo "$2 - $(git log --format='%h - %ai')" >> $MANIFEST 2>&1; \
+	git submodule init; \
+	git submodule sync --recursive; \
+	git submodule update --recursive; \
 	rm -rf .git; \
 	cd ..; \
 }; \
+#
+# Install extensions for the `bat` pager
+cd $TMP; \
+CMD=bat-extras; \
+getGitHubAndLogVersion eth-p $CMD; \
+cd $CMD; \
+mkdir -p /opt/$CMD/bin; \
+export TMPDIR=/tmp; \
+export TERM=dumb; \
+./build.sh --install --prefix=/opt/$CMD; \
 #
 # Install "The Ultimate Vim Configuration"
 cd $TMP; \
@@ -293,6 +307,7 @@ cd $CMD; \
 sed -i -e '/^#.*navigation/{s/.*/# nix-nice: set terminal to "tmux" so we can have italics\nset -g default-terminal "tmux"\n&/;}' \
        -e '/#tmux_conf_theme_.*_separator_/{s/^#//;}' \
        -e '/tmux_conf_theme_status_right=/{s/ / #{custom}/;}' \
+       -e '/tmux_conf_battery_status_charging=.*26A1/{s/^#//;}' \
        -e '/os_clipboard/{s/false/true/;}' \
 	${CMD}.conf.local; \
 cp ${CMD}.conf /etc/profile.d/tmux.conf; \
@@ -339,6 +354,8 @@ makeToyAndBusyBoxLinks; \
 #
 #
 # Configure the stuff we just installed
+#
+grep TMPDIR /etc/environment || echo "TMPDIR=/tmp" >> /etc/environment; \
 #
 # ubuntu auto-generates server keys for SSH;
 # just need to turn on X11 forwarding for remote clients and work around

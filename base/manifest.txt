@@ -63,6 +63,7 @@ bitwise v0.41
 xsv 0.13.0
 gron version 0.6.0
 trdsql trdsql version v0.7.5
+bat-extras - bad5ab1 - 2020-04-27 19:09:59 -0700
 vimrc - 31256d6 - 2020-04-16 10:47:00 +0800
 .tmux - 2e40091 - 2020-04-21 14:56:12 -0500
 fonts - e80e3eb - 2018-11-11 15:22:30 +0300
@@ -84,16 +85,16 @@ ii  ripgrep        12.0.1       amd64        ripgrep is a line-oriented search t
 ----------------------
 Defaults For New Users
 d41d8cd98f00b204e9800998ecf8427e  /etc/skel/.Xauthority
-f0dc05aef8d25ef9235660b9f2f497c9  /etc/skel/.Xdefaults
+417258f5904dd3713abdcff405f96ad9  /etc/skel/.Xdefaults
 22bfb8c1dd94b5f3813a2b25da67463f  /etc/skel/.bash_logout
 aa39a5e2e2603394797b9481a66ef455  /etc/skel/.bashrc
 62747c19dbc892a1048f660fd8b08bf7  /etc/skel/.config/bat/config
 6eabaca0699a81a8976bab69d1128b98  /etc/skel/.config/nvim/init.vim
 35f54adf5f3ba197c9f9e7ad6414b81a  /etc/skel/.config/nvim/my_configs.vim
 ab632379e55322293328cbfaa0916af6  /etc/skel/.config/rsync/my_excludes
-8f1a5b1a1aee9364ab8dddb00b9bfb16  /etc/skel/.config/trdsql/config.json
+1cae5d3f7adbfc3c6794a020e54f4d29  /etc/skel/.config/trdsql/config.json
 118a49c760f3c2829d788f7e47fbfb2b  /etc/skel/.profile
-fe6d596fc005c64730d6d44deb7107db  /etc/skel/.tmux.conf.local
+d375db0459a61cbf271ee6543214aa1c  /etc/skel/.tmux.conf.local
 
 
 
@@ -104,7 +105,7 @@ b47931b94bd3219734b11afeb1ffc279  /opt/nix-nice/bin/cb.sh
 014025bff643a37f1b0992133866e857  /opt/nix-nice/bin/finalnewline.sh
 c492adf682546250125faf50a8956e06  /opt/nix-nice/bin/rgbat.sh
 0a4cce7f36cc2945ef0dd50b6d4b0ca8  /opt/nix-nice/bin/urlencode.sh
-2231e27289ac42f5af576cd431f1011a  /opt/nix-nice/etc/manifest.txt
+af02913189bb14da1c792159421162dc  /opt/nix-nice/etc/manifest.txt
 c114c8646052e49c45065cd2165ef54a  /opt/nix-nice/etc/persistfs-files
 99bc826296648cd70d69fcbde10ed1c0  /opt/nix-nice/sbin/container-startup.sh
 e52f1985db56e490f481bf76bcc9d574  /opt/nix-nice/sbin/create-links.sh

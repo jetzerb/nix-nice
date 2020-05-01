@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+IFS=$'\n\t';
+set -euo pipefail;
+
+#
+usage() {
+	cat <<EOF
+Some 3rd party applications require specific older versions of libraries.
+This script will make a bunch of links representing different versions, all
+pointing to the current version.
+
+Call this script with up to 2 arguments:
+1. the base library file, without the version info
+   (e.g., /path/to/libfoo rather than /path/to/libfoo.so.99.8.7)
+2. the number of back-versions to make (default 5)
+   (e.g., 2 to make make libfoo.so.98, libfoo.so.97)
+EOF
+	exit 0;
+}
+
+# Get commandline args into variables
+lib=${1:-};
+numVer=${2:-5};
+
+# if no args or plea for help passed in instead of library, show usage
+case "$lib" in
+	''|'-?'|'-h'|'--help') usage;
+esac;
+
+
+# jump into the dir holding the library file
+cd "${lib%/*}" || exit 1;
+
+echo "$lib is in dir $PWD";
+lib=${lib##*/}; # strip off directory
+lib=${lib%%.so.*};
+echo "all that's left of the lib is $lib";
+
+for file in $(find . -maxdepth 1 -type l -name "$lib"'*so.[0-9]*')
+do
+	src="$(realpath "$file")";
+	echo "Making links for $file -> $src";
+
+	cur="$(echo "$file" | sed 's/.*so\.//; s/\..*//;')";
+	for i in $(seq "$numVer")
+	do
+		ver=$(( cur - i ));
+		tgt="${file/.so.$cur/.so.$ver}";
+		[ -h "$tgt" ] && continue;
+		ln -s "$src" "$tgt";
+		echo -e "\t$tgt";
+	done;
+done;
