@@ -207,7 +207,7 @@ ud() {
 
 	SUB="$*";
 	[ -n "$SUB" ] && [ "${SUB:1:1}" != "/" ] && SUB="/$SUB";
-	eval 'cd '"$TGT$SUB";  # use eval so globbing works
+	eval 'cd '"'$TGT'$SUB";  # use eval so globbing works
 }
 
 
