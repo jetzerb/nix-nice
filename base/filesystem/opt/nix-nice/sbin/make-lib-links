@@ -31,15 +31,12 @@ esac;
 # jump into the dir holding the library file
 cd "${lib%/*}" || exit 1;
 
-echo "$lib is in dir $PWD";
 lib=${lib##*/}; # strip off directory
 lib=${lib%%.so.*};
-echo "all that's left of the lib is $lib";
 
 for file in $(find . -maxdepth 1 -type l -name "$lib"'*so.[0-9]*')
 do
 	src="$(realpath "$file")";
-	echo "Making links for $file -> $src";
 
 	cur="$(echo "$file" | sed 's/.*so\.//; s/\..*//;')";
 	for i in $(seq "$numVer")

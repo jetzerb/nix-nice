@@ -63,7 +63,7 @@ bitwise v0.41
 xsv 0.13.0
 gron version 0.6.0
 trdsql trdsql version v0.7.5
-bat-extras - bad5ab1 - 2020-04-27 19:09:59 -0700
+bat-extras - 529eb60 - 2020-05-03 18:28:02 -0700
 vimrc - 31256d6 - 2020-04-16 10:47:00 +0800
 .tmux - 2e40091 - 2020-04-21 14:56:12 -0500
 fonts - e80e3eb - 2018-11-11 15:22:30 +0300
@@ -100,16 +100,15 @@ d375db0459a61cbf271ee6543214aa1c  /etc/skel/.tmux.conf.local
 
 --------------------
 Nix-Nice Executables
+cda90f5c09a8bb2c46f4911a932bd9e3  /etc/profile.d/nix-nice-00.sh
 b47931b94bd3219734b11afeb1ffc279  /opt/nix-nice/bin/cb.sh
 262331ea901ced3c2b52ee7645ff9024  /opt/nix-nice/bin/cmphost.sh
 014025bff643a37f1b0992133866e857  /opt/nix-nice/bin/finalnewline.sh
 c492adf682546250125faf50a8956e06  /opt/nix-nice/bin/rgbat.sh
 0a4cce7f36cc2945ef0dd50b6d4b0ca8  /opt/nix-nice/bin/urlencode.sh
-af02913189bb14da1c792159421162dc  /opt/nix-nice/etc/manifest.txt
-c114c8646052e49c45065cd2165ef54a  /opt/nix-nice/etc/persistfs-files
+0e5bbbc84b9aa839a4816c3890957a5c  /opt/nix-nice/etc/manifest.txt
 99bc826296648cd70d69fcbde10ed1c0  /opt/nix-nice/sbin/container-startup.sh
 e52f1985db56e490f481bf76bcc9d574  /opt/nix-nice/sbin/create-links.sh
 b4019911b8e5ed90e0103e5f463993b5  /opt/nix-nice/sbin/create-users.sh
 cf899ce25ccbaa6d795512082a27e94a  /opt/nix-nice/sbin/environment-setup.sh
-f4634a0aaa0e62a95f0ae897fc064a6c  /opt/nix-nice/sbin/make-lib-links
-888178d651a30dc243ce07fe02b00ed3  /opt/nix-nice/sbin/persistfs-sync.sh
+e48686370ce8e0f0e45bd0fcd4f44812  /opt/nix-nice/sbin/make-lib-links
