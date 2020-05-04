@@ -57,7 +57,7 @@ ways:
 You get into the container via ssh using key-based authentication.
 The container startup script assumes there's a /hosthome mount and looks
 for users with a ".ssh" folder, and then proceeds to create each of those
-users inside the container and copies in the user's public key. So each
+users inside the container and copies in the user's public keys. So each
 interested user should run `ssh-keygen` if they don't yet have keys.
 #### Optionally Create Docker Volume
 If you plan to use the container for development purposes, you'll
@@ -69,9 +69,9 @@ docker volume create userdata
 ```
 
 #### Start the Container
-See `container-start*` files in the `container` folder of the
-[nix-nice](https://github.com/jetzerb/nix-nice) git repo.  On windows,
-you'd issue a command like this:
+See `container-start*` files and/or docker compose files in the `container`
+folder of the [nix-nice](https://github.com/jetzerb/nix-nice) git repo.
+On Windows, you'd issue a command like this:
 ```dos
 docker run --detach ^
 -e "MYTZ=America/Chicago" ^
@@ -81,8 +81,7 @@ docker run --detach ^
 -p 9922:22 ^
 -h nix-nice ^
 --name nix-nice ^
-jetzerb/nix-nice:TagNameGoesHere ^
--eus
+jetzerb/nix-nice:TagNameGoesHere
 ```
 
 The `MYTZ` and `MYLOCALE` variables cause the container startup script
@@ -105,12 +104,6 @@ The `--name` option sets the docker container name (as displayed by
 
 Be sure to specify the desired tag name in place of `TagNameGoesHere`.
 
-The final list of options are
-- `-e`: set up environment variables
-- `-u`: create users, based on the `/hosthome` mount
-- `-s`: start the SSH service
-
-
 In a \*NIX environment, you'd issue the same command as above, but with
 backslashes (\\) instead of carets (^) as the line continuation character,
 and you'd specify `/home` in place of `C:\Users` in the bind mount.
@@ -131,7 +124,7 @@ since it comes bundled with an X server.
   image builds faster and is much smaller than the corresponding Ubuntu-based
   image.  However, Alpine is based on the [musl](https://www.musl-libc.org/)
   c library, rather than [glibc](https://www.gnu.org/software/libc/).
-  Electron (the framework upon which Atom, VS Code, SQL Ops Studio, and
+  Electron (the framework upon which Atom, VS Code, SQL Data Studio, and
   other cool toys are built) [doesn't work with
   musl](https://github.com/electron/electron/issues/9662).
   I switched to Ubuntu.  It also has more packages that I'm
