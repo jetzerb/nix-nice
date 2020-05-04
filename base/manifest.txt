@@ -111,4 +111,4 @@ c492adf682546250125faf50a8956e06  /opt/nix-nice/bin/rgbat.sh
 e52f1985db56e490f481bf76bcc9d574  /opt/nix-nice/sbin/create-links.sh
 b4019911b8e5ed90e0103e5f463993b5  /opt/nix-nice/sbin/create-users.sh
 cf899ce25ccbaa6d795512082a27e94a  /opt/nix-nice/sbin/environment-setup.sh
-f4634a0aaa0e62a95f0ae897fc064a6c  /opt/nix-nice/sbin/make-lib-links
+e48686370ce8e0f0e45bd0fcd4f44812  /opt/nix-nice/sbin/make-lib-links
