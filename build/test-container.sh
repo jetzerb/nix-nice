@@ -24,6 +24,7 @@ hdr "Defaults For New Users";
 md5sum $(find /etc/skel -type f |sort);
 
 hdr "Nix-Nice Executables";
+md5sum $(find /etc/ -type f -name 'nix-nice*' | sort);
 md5sum $(find /opt/nix-nice -type f | sort);
 
 if [ $(command -v git) ]
