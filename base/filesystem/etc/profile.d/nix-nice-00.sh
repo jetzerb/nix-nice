@@ -217,6 +217,43 @@ export LANG=en_US.UTF-8;
 # Ensure browser set (or ddgr will not work properly)
 export BROWSER=www-browser;
 
+# Set environment variables for each non-printable ASCII character
+#ASCII_NUL=$(printf "\x00"); export ASCII_NUL; # null; can't do this because c strings are null terminated
+ASCII_SOH=$(printf "\x01"); export ASCII_SOH; # start of heading
+ASCII_STX=$(printf "\x02"); export ASCII_STX; # start of text
+ASCII_ETX=$(printf "\x03"); export ASCII_ETX; # end of text
+ASCII_EOT=$(printf "\x04"); export ASCII_EOT; # end of transmission
+ASCII_ENQ=$(printf "\x05"); export ASCII_ENQ; # enquiry
+ASCII_ACK=$(printf "\x06"); export ASCII_ACK; # acknowledge
+ASCII_BEL=$(printf "\x07"); export ASCII_BEL; # bell
+ASCII_BS=$( printf "\x08"); export ASCII_BS ; # backspace
+ASCII_HT=$( printf "\x09"); export ASCII_HT ; # horizontal tab
+ASCII_LF=$( printf "\x0A"); export ASCII_LF ; # NL line feed, newline
+ASCII_VT=$( printf "\x0B"); export ASCII_VT ; # vertical tab
+ASCII_FF=$( printf "\x0C"); export ASCII_FF ; # NP form feed, new page
+ASCII_CR=$( printf "\x0D"); export ASCII_CR ; # carriage return
+ASCII_SO=$( printf "\x0E"); export ASCII_SO ; # shift out
+ASCII_SI=$( printf "\x0F"); export ASCII_SI ; # shift in
+ASCII_DLE=$(printf "\x10"); export ASCII_DLE; # data link escape
+ASCII_DC1=$(printf "\x11"); export ASCII_DC1; # device control 1
+ASCII_DC2=$(printf "\x12"); export ASCII_DC2; # device control 2
+ASCII_DC3=$(printf "\x13"); export ASCII_DC3; # device control 3
+ASCII_DC4=$(printf "\x14"); export ASCII_DC4; # device control 4
+ASCII_NAK=$(printf "\x15"); export ASCII_NAK; # negative acknowledge
+ASCII_SYN=$(printf "\x16"); export ASCII_SYN; # synchronous idle
+ASCII_ETB=$(printf "\x17"); export ASCII_ETB; # end of transmission block
+ASCII_CAN=$(printf "\x18"); export ASCII_CAN; # cancel
+ASCII_EM=$( printf "\x19"); export ASCII_EM ; # end of medium
+ASCII_SUB=$(printf "\x1A"); export ASCII_SUB; # substitute
+ASCII_ESC=$(printf "\x1B"); export ASCII_ESC; # escape
+ASCII_FS=$( printf "\x1C"); export ASCII_FS ; # file separator
+ASCII_GS=$( printf "\x1D"); export ASCII_GS ; # group separator
+ASCII_RS=$( printf "\x1E"); export ASCII_RS ; # record separator
+ASCII_US=$( printf "\x1F"); export ASCII_US ; # unit separator
+ASCII_DEL=$(printf "\x7F"); export ASCII_DEL; # delete
+
+
+
 # ---------
 # Set up fzf (fuzzy finder)
 for myFZF in \
