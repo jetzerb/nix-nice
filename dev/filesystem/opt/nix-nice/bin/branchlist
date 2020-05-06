@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+set -euo pipefail;
+IFS=$'\n\t';
+
+#
+# Function to show usage information if unknown option(s) specified
+#
+usage () {
+	cat <<EOF >&2
+Invalid input encountered at "$@";
+
+Show the status of each branch matching the specified pattern, relative to the
+"base" branch for the repo.
+
+Usage: $0 [-c compareBranch] [-f output format] [-d delim] [-h] [-v] [branchPattern]
+
+    -c compareBranch: specify the "compare to" branch (e.g. master);
+       defaults to the repo's default branch if not specified
+
+    -f format: specify the trdsql output format (at, json, etc);
+       defaults to csv if not specified
+
+    -d delim: specify the output delimiter (for csv output format);
+       defaults to ASCII Unit Separator (0x1F, 37) if not specified
+
+    -h include headers in the output;
+       defaults to no headers if not specified
+
+    -v verbose output (sent to STDERR so as to not disturb STDOUT)
+}
+EOF
+	exit 1;
+}
+
+# Establish defaults
+sep=$(printf "\x1f"); # ASCII "unit separator" for delimiting data within this script
+
+out_fmt="-oat"; # ascii table output
+pfx="";        # don't include base/compare branch in output
+verbose="";    # keep quiet
+
+
+# Process commandline arguments
+while getopts ":c:f:d:hv" opt
+do
+	case "$opt" in
+		c) base_branch=$OPTARG;;
+		f) out_fmt="-o$OPTARG";;
+		d) delim="$OPTARG";;
+		h) header="-oh";;
+		v) verbose=1;;
+		*) usage "${@:$((OPTIND - 1)):99}"; exit 1;;
+	esac;
+done;
+
+shift $((OPTIND -1));
+branch_ptn="${1:-*}"; # default to all branches if none specified
+
+cmd_args=("-icsv" "-ih" "-id" "$sep" "$out_fmt");
+[ -n "${delim:-}"  ] && cmd_args+=("-od" "$delim");
+[ -n "${header:-}" ] && cmd_args+=("$header");
+
+[ -z "${base_branch:-}" ] && base_branch="$(git branch -r |awk '/HEAD/ {print $3;}')";
+
+[ -n "$verbose" ] && cat <<EOF >&2
+base branch:      [$base_branch]
+branch pattern:   [$branch_ptn]
+
+trdsql options:   [${cmd_args[@]}]
+	input  delim hex: [$(echo -n ${sep}     | xxd -p)]
+	output delim hex: [$(echo -n ${delim:-} | xxd -p)]
+EOF
+
+# Gather stats for all branches matching the specified pattern, or all branches
+print_hdr=1;
+git branch -a --list "$branch_ptn" |
+sed '/HEAD/d; s/^[ \*]*//; s!^remotes/!!;' |
+while read -r branch
+do
+	[ "$branch" = "$base_branch" ] && continue;
+
+	behind_ahead="$(git rev-list --left-right --count "$base_branch"..."$branch")";
+	git log --format="%ai${sep}%an${sep}%s"  --name-status --no-merges "$base_branch".."$branch" |
+	awk -F "$sep" -v OFS="$sep" -v print_hdr="$print_hdr" -v base="$base_branch" -v branch="$branch" -v behind_ahead="$behind_ahead" '
+
+	BEGIN {
+		behind = ahead = behind_ahead;
+		sub(/\t.*/,"",behind);
+		sub(/.*\t/,"",ahead);
+		if (print_hdr) {
+			print "BaseBranch", "Branch", "BehindBy", "AheadBy", "FileCnt", "FirstCommitDt", "FirstCommitBy", "LastCommitDt", "LastCommitBy", "AuthorCnt", "PrimaryAuthor", "PrimaryCommitCnt", "PrimaryFileCnt";
+		}
+	}
+
+	# Gather stats from individual commits
+	NF == 3 {
+		dt = $1; author = $2; cmt = $3;
+
+		if (author ~ /,/) {
+			split(author,nmPc,", ");
+			author = nmPc[2] " " nmPc[1];
+		}
+
+		commitCnt++;
+		if (!authorList[author]) authorCnt++;
+		authorList[author]++; # number of commits for this author
+		if (!firstDt || dt < firstDt) { firstDt = dt; firstBy = author; }
+		if (! lastDt || dt >  lastDt) {  lastDt = dt;  lastBy = author; }
+		if (authorList[author] > primaryCnt ) {
+			primaryCnt    = authorList[author];
+			primaryAuthor = author;
+		}
+	}
+
+	# Count the files touched in this commit
+	/^[A-Z]/ {
+		files++;
+		authorFiles[author]++;
+	}
+
+	# Output the findings
+	END {
+		print base, branch, behind, ahead, files, firstDt, firstBy, lastDt, lastBy, authorCnt, primaryAuthor, primaryCnt, authorFiles[primaryAuthor];
+	}';
+	[ -n "$print_hdr" ] && print_hdr="";
+done |
+trdsql "${cmd_args[@]}" "select $pfx * from - order by replace(Branch,'origin/',''), case when Branch like 'origin%' then 1 else 0 end";
