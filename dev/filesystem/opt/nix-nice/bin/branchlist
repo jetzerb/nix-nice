@@ -2,126 +2,268 @@
 set -euo pipefail;
 IFS=$'\n\t';
 
-#
-# Function to show usage information if unknown option(s) specified
-#
 usage () {
 	cat <<EOF >&2
-Invalid input encountered at "$@";
+$(
+	case "$@" in
+		-"?"|*-help) ;;
+		*)	echo "Invalid input encountered at [$@]";;
+	esac;
+)
+Output summary statistics about each branch matching the specified pattern.
+Shows info on commits not in the base/compare branch.  If the base/compare
+branch is included in the output, stats for ALL commits in that branch
+are included.
 
-Show the status of each branch matching the specified pattern, relative to the
-"base" branch for the repo.
+Usage: $(basename "$0") OPTIONS [branchPattern]
 
-Usage: $0 [-c compareBranch] [-f output format] [-d delim] [-h] [-v] [branchPattern]
+Content-based options:
+    -c compareBranch: specify the "compare to" branch.
+       Defaults to the repo's default branch if not specified.
 
-    -c compareBranch: specify the "compare to" branch (e.g. master);
-       defaults to the repo's default branch if not specified
+    -l layout: specify what columns to display.  Values for layout
+       include a couple shortcuts for pre-configured lists of columns
+       (see below), or your own specified list of columns. NOTE:
+       this flag does nothing if raw output is specified.  Shortcut
+       values include$(printf "\n        %s" "${layout_options[@]}")
+       If you specify a list of columns, it must be a comma-delimited list,
+       just like a SQL "select" statement (SQLite dialect).  If you include
+       any spaces in your list, you must quote the entire string so it is
+       processed as a single commandline argument.
+
+    -x exclude the compare branch.  If that branch contains significant
+       activity (commits, files, LOC), this can save processing time.
+
+Format-based options:
+    -r output in raw format rather than piping through trdsql.
+       When outputting in raw format, all columns are always included.
 
     -f format: specify the trdsql output format (at, json, etc);
        defaults to csv if not specified
 
-    -d delim: specify the output delimiter (for csv output format);
-       defaults to ASCII Unit Separator (0x1F, 37) if not specified
+    -d delim: specify the output delimiter (for raw or csv output format);
+       defaults to comma if not specified
 
     -h include headers in the output;
        defaults to no headers if not specified
 
+Debugging options:
     -v verbose output (sent to STDERR so as to not disturb STDOUT)
-}
+
+
+Output fields are as follows:
+$(printf "\n%s" "${col_doc[@]%%$sep*}";)
 EOF
 	exit 1;
 }
 
-# Establish defaults
+# Establish some defaults
 sep=$(printf "\x1f"); # ASCII "unit separator" for delimiting data within this script
-
+delim="$sep";
 out_fmt="-oat"; # ascii table output
-pfx="";        # don't include base/compare branch in output
 verbose="";    # keep quiet
 
 
+# Column definitions, for display in usage() function, as well as determining
+# column lists output by this script.
+col_doc=(
+"Base Branch Level"
+"- BaseBranch = the name of the branch against which all others are compared${sep}short"
+""
+"Branch Level"
+"- Branch   = the branch to which these stats apply${sep}shortCond"
+"- BehindBy = number of commits in the base branch but not in this branch"
+"- AheadBy  = number of commits in this branch but not in the base branch"
+""
+'Branch Stats (pertaining only to the "AheadBy" commits, or all commits in the base branch)'
+"- FileModCnt        = count of file modifications"
+"- LineModCnt        = total lines modified across all files and commits"
+"- AuthorCnt         = number of distinct authors"
+"- FirstDt           = date of first commit"
+"- FirstAuthor       = author of first commit"
+"- LastDt            = date of most recent commit"
+"- LastAuthor        = author of most recent commit"
+"- PrimaryAuthor     = author with the most activity"
+"- PrimaryCommitCnt  = primary author commit count${sep}short${sep}medium"
+"- PrimaryFileModCnt = primary author file modification count${sep}short${sep}medium"
+"- PrimaryLineModCnt = primary author line modification count${sep}short${sep}medium"
+);
+
+layout_options=(short medium long);
+declare -A columns=(); # to hold column lists for each layout option
+opt=("${layout_options[@]}"); # copy of layout options used in the parsing of the above
+for (( i=0; i<${#col_doc[@]}; i++ ))
+do
+	[ "${col_doc[i]:0:1}" = "-" ] || continue;
+
+	# compile lists of just the column names
+	col="${col_doc[i]#- }";
+	col="${col%% *}";
+	for (( j=0; j<${#opt[@]}; j++ ))
+	do
+		case "${col_doc[i]}" in
+			*$sep${opt[j]}*)
+				layout_options[j]="${layout_options[j]},$col";;
+			*)
+				columns[${opt[j]}]+=",$col";;
+		esac;
+		case "${col_doc[i]}" in
+			*$sep${opt[j]}Cond*)
+				layout_options[j]="${layout_options[j]} if only 1 value";
+				columns[${opt[j]}]+=",${col}Cond";;
+		esac;
+	done;
+done;
+
+for (( j=0; j<${#layout_options[@]}; j++ ))
+do
+	case "${layout_options[j]}" in
+		*,*) layout_options[j]="- ${layout_options[j]/,/: no }";;
+		*)   layout_options[j]="- ${layout_options[j]}: include all columns";;
+	esac;
+done;
+
+
 # Process commandline arguments
-while getopts ":c:f:d:hv" opt
+while getopts ":c:l:xrf:d:hv" opt
 do
 	case "$opt" in
 		c) base_branch=$OPTARG;;
+		l) layout=$OPTARG;;
+		x) skip_base=1;;
+		r) out_raw="Outputting raw data.";;
 		f) out_fmt="-o$OPTARG";;
 		d) delim="$OPTARG";;
 		h) header="-oh";;
 		v) verbose=1;;
-		*) usage "${@:$((OPTIND - 1)):99}"; exit 1;;
+		*) usage "${@:$((OPTIND - 1)):99}";;
 	esac;
 done;
 
+# Modify commandline args if necessary
+[ -z "${base_branch:-}" ] && base_branch="$(git branch -r |awk '/HEAD/ {print $3;}')";
+layout="${layout:-medium}";
+[ -n "${columns[$layout]:-}" ] && layout="${columns[$layout]}";
+
 shift $((OPTIND -1));
 branch_ptn="${1:-*}"; # default to all branches if none specified
+mapfile -t branch_list < <(
+	git branch -a --list "$branch_ptn" |
+	sed 's/^[ \*] *//; s!.*/HEAD -> !!; s!^remotes/!!;' |
+	(if [ -n "${skip_base:-}" ]; then sed "/${base_branch//\//\\/}/d"; else cat; fi;) |
+	sort -u);
+case "${#branch_list[@]}" in
+	0)
+		echo "No branches match the pattern '$branch_ptn'." >&2;
+		exit 2;;
+	1)
+		layout="${layout/,BranchCond/}";;
+	*)
+		layout="${layout/,BranchCond/,Branch}";
+		;;
+esac;
+layout="${layout/#,/}";
 
 cmd_args=("-icsv" "-ih" "-id" "$sep" "$out_fmt");
 [ -n "${delim:-}"  ] && cmd_args+=("-od" "$delim");
 [ -n "${header:-}" ] && cmd_args+=("$header");
 
-[ -z "${base_branch:-}" ] && base_branch="$(git branch -r |awk '/HEAD/ {print $3;}')";
+[ -z "${out_raw:-}" ] && [ ! "$(command -v trdsql)" ] && out_raw="trdsql command not found! Outputting raw data.";
 
 [ -n "$verbose" ] && cat <<EOF >&2
-base branch:      [$base_branch]
+base branch:      [$base_branch] $([ -n "${skip_base:-}" ] && printf "%s" "(not included in the output)";)
 branch pattern:   [$branch_ptn]
+matching branches: $(printf "\n\t%s" "${branch_list[@]}";)
 
 trdsql options:   [${cmd_args[@]}]
-	input  delim hex: [$(echo -n ${sep}     | xxd -p)]
-	output delim hex: [$(echo -n ${delim:-} | xxd -p)]
+	input  delim hex: [$(echo -n "${sep}"     | xxd -p)]
+	output delim hex: [$(echo -n "${delim:-}" | xxd -p)]
+
+desired columns: $layout
+
+${out_raw:-}
 EOF
 
-# Gather stats for all branches matching the specified pattern, or all branches
+# Gather stats for all the branches we care about
 print_hdr=1;
-git branch -a --list "$branch_ptn" |
-sed '/HEAD/d; s/^[ \*]*//; s!^remotes/!!;' |
-while read -r branch
+for branch in "${branch_list[@]}"
 do
-	[ "$branch" = "$base_branch" ] && continue;
+	if [ -n "${print_hdr:-}" ] && { [ -z "${out_raw:-}" ] || [ -n "${header:-}" ]; }
+	then
+		columns[long]="${columns[long]/#,/}";
+		echo "${columns[long]//,/$sep}";
+		print_hdr="";
+	fi;
 
+	# Print line-level header info
 	behind_ahead="$(git rev-list --left-right --count "$base_branch"..."$branch")";
-	git log --format="%ai${sep}%an${sep}%s"  --name-status --no-merges "$base_branch".."$branch" |
-	awk -F "$sep" -v OFS="$sep" -v print_hdr="$print_hdr" -v base="$base_branch" -v branch="$branch" -v behind_ahead="$behind_ahead" '
+
+	line="$base_branch,$branch,$behind_ahead";
+	line=${line//,/$sep};
+	line=${line//$(printf "\t")/$sep}${sep}; # behind_ahead output includes tab
+	printf  "%s" "$line";
+	print_hdr="";
+
+	# if base branch, list ALL commits. otherwise just those in the branch but not in the base
+	cmd='git log --format=">>${sep}%ai${sep}%an"  --shortstat --no-merges "$base_branch"';
+	[ "$branch" = "$base_branch" ] || cmd="$cmd"'.."$branch"';
+
+	eval "$cmd" |
+	awk -F "$sep" -v OFS="$sep" '
 
 	BEGIN {
-		behind = ahead = behind_ahead;
-		sub(/\t.*/,"",behind);
-		sub(/.*\t/,"",ahead);
-		if (print_hdr) {
-			print "BaseBranch", "Branch", "BehindBy", "AheadBy", "FileCnt", "FirstCommitDt", "FirstCommitBy", "LastCommitDt", "LastCommitBy", "AuthorCnt", "PrimaryAuthor", "PrimaryCommitCnt", "PrimaryFileCnt";
-		}
+		# git shortstat words to look for
+		file   = "file";
+		insdel = "insert|delet";
 	}
 
 	# Gather stats from individual commits
-	NF == 3 {
-		dt = $1; author = $2; cmt = $3;
+	$1 == ">>" {
+		dt = $2; author = $3;
 
-		if (author ~ /,/) {
-			split(author,nmPc,", ");
-			author = nmPc[2] " " nmPc[1];
+		# ensure "last, first" name format in case people want to sort on it
+		if (author !~ /,/) {
+			gsub(/ +/," ",author); # condense multiple spaces to single
+			l = split(author,nmPc," ");
+			author = nmPc[l] ",";
+			for (i = 1; i < l; i++) author = author " " nmPc[i];
 		}
 
-		commitCnt++;
-		if (!authorList[author]) authorCnt++;
-		authorList[author]++; # number of commits for this author
-		if (!firstDt || dt < firstDt) { firstDt = dt; firstBy = author; }
-		if (! lastDt || dt >  lastDt) {  lastDt = dt;  lastBy = author; }
-		if (authorList[author] > primaryCnt ) {
-			primaryCnt    = authorList[author];
+		if (!authors[author]) authorCnt++;
+		authors[author]++; # number of commits for this author
+		if (authors[author] > primaryCnt ) {
+			primaryCnt    = authors[author];
 			primaryAuthor = author;
 		}
+		if (!firstDt || dt < firstDt) { firstDt = dt; firstBy = author; }
+		if (! lastDt || dt >  lastDt) {  lastDt = dt;  lastBy = author; }
 	}
 
-	# Count the files touched in this commit
-	/^[A-Z]/ {
-		files++;
-		authorFiles[author]++;
+	# short stat line
+	/^ [0-9]/ {
+		sub(/^ +/,"");
+		gsub(" ",FS);
+		for (i = 2; i <= 7; i++) {
+			     if ($i ~ file   ) files[author] += $(i-1);
+			else if ($i ~ insdel ) lines[author] += $(i-1);
+		}
 	}
 
 	# Output the findings
 	END {
-		print base, branch, behind, ahead, files, firstDt, firstBy, lastDt, lastBy, authorCnt, primaryAuthor, primaryCnt, authorFiles[primaryAuthor];
+		for (author in authors) {
+			totFiles += files[author];
+			totLines += lines[author];
+		}
+		p = primaryAuthor; # save some typing
+		print totFiles, totLines, authorCnt, firstDt, firstBy, lastDt, lastBy, p, primaryCnt, files[p], lines[p];
 	}';
-	[ -n "$print_hdr" ] && print_hdr="";
 done |
-trdsql "${cmd_args[@]}" "select $pfx * from - order by replace(Branch,'origin/',''), case when Branch like 'origin%' then 1 else 0 end";
+(
+	if [ -n "${out_raw:-}" ]
+	then
+		sed "s/$sep/$delim/g;";
+	else
+		trdsql "${cmd_args[@]}" "select $layout from - order by replace(Branch,'origin/',''), case when Branch like 'origin%' then 1 else 0 end";
+	fi;
+)
