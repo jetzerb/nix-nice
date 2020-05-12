@@ -16,27 +16,26 @@ prependPath () {
 }
 
 # Include 3rd party exe paths and tab completion
-for myDIR in /opt/*
+for dir in /opt/*
 do
-	[ -d "$myDIR" ] || continue;
-	for myFILE in "$myDIR"/*.completion
+	[ -d "$dir" ] || continue;
+	for file in "$dir"/*.completion
 	do
-		[ -f "$myFILE" ] && . "$myFILE";
+		[ -f "$file" ] && . "$file";
 	done;
-	myFound=;
-	for myBIN in /bin /sbin ""
+	found=;
+	for bin in /bin /sbin ""
 	do
-		myPATH="$myDIR$myBIN";
-		if [ -d "$myPATH" ]
+		path="$dir$bin";
+		if [ -d "$path" ]
 		then
 			# don't add base path if already added bin and/or sbin
-			[ -n "$myFound" ] && [ -z "$myBIN" ] && continue;
-			myFound=1;
-			prependPath "$myPATH";
+			[ -n "$found" ] && [ -z "$bin" ] && continue;
+			found=1;
+			prependPath "$path";
 		fi;
 	done;
 done;
-unset myDIR myFILE myPATH myBIN;
 prependPath "$HOME/bin";
 prependPath "$HOME/.local/bin";
 
@@ -71,56 +70,53 @@ alias less='/usr/bin/less -iKMNQRWX';
 # otherwise python3
 if ! type python >/dev/null 2>&1
 then
-	for myCMD in 2 3
+	for cmd in 2 3
 	do
-		myCMD=/usr/bin/python$myCMD
-		if [ -x $myCMD ]
+		cmd=/usr/bin/python$cmd
+		if [ -x $cmd ]
 		then
-			alias python=$myCMD;
+			alias python=$cmd;
 			break;
 		fi;
 	done;
 fi;
-unset myCMD;
 
 # I like vi
-myCMD="$(command -v vi)";
+cmd="$(command -v vi)";
 # if it's aliased, pull out the executable
-case "$myCMD" in
+case "$cmd" in
 	"alias vi="*)
-		myCMD="${myCMD#*=\'}";
-		myCMD="${myCMD%\'}";;
+		cmd="${cmd#*=\'}";
+		cmd="${cmd%\'}";;
 esac;
-if [ -n "$myCMD" ]
+if [ -n "$cmd" ]
 then
-	export VISUAL="$myCMD";
-	export EDITOR="$myCMD";
+	export VISUAL="$cmd";
+	export EDITOR="$cmd";
 fi;
-myCMD=$(realpath "$myCMD");
-if [ -n "$myCMD" ]
+cmd=$(realpath "$cmd");
+if [ -n "$cmd" ]
 then
-	myCMD=$(basename "$myCMD");
+	cmd=$(basename "$cmd");
 	# less.sh is like less but with color syntax
-	myCMD=/usr/share/"$myCMD"/runtime/macros/less.sh;
-	[ -f "$myCMD" ] && alias lesss="$myCMD";
+	cmd=/usr/share/"$cmd"/runtime/macros/less.sh;
+	[ -f "$cmd" ] && alias lesss="$cmd";
 fi;
-unset myCMD;
 
 
 # nobody likes to type ".sh"
 pushd . >/dev/null;
-IFS=':' read -ra myDIRS <<< "$PATH";
-for myDIR in "${myDIRS[@]}"
+IFS=':' read -ra dirs <<< "$PATH";
+for dir in "${dirs[@]}"
 do
-	[ -d "$myDIR" ] || continue;
-	cd "$myDIR" || continue;
-	for myCMD in $(/bin/ls -1f ./*.sh 2>/dev/null)
+	[ -d "$dir" ] || continue;
+	cd "$dir" || continue;
+	for cmd in $(/bin/ls -1f ./*.sh 2>/dev/null)
 	do
-		myCMD=${myCMD#./};
-		alias "${myCMD%.sh}"="$myDIR/$myCMD";
+		cmd=${cmd#./};
+		alias "${cmd%.sh}"="$dir/$cmd";
 	done;
 done;
-unset myDIRS myDIR myCMD;
 popd >/dev/null || echo "Unable to pop directory";
 
 
@@ -260,11 +256,10 @@ eval "$ascii_cmd";
 
 # ---------
 # Set up fzf (fuzzy finder)
-for myFZF in \
+for src in \
 	/opt/fzf/shell/completion.bash \
 	/opt/fzf/shell/key-bindings.bash \
 	~/.fzf.bash
 do
-	[ -f "$myFZF" ] && . "$myFZF";
+	[ -f "$src" ] && . "$src";
 done;
-unset myFZF;

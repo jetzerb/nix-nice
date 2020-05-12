@@ -100,7 +100,7 @@ d375db0459a61cbf271ee6543214aa1c  /etc/skel/.tmux.conf.local
 
 --------------------
 Nix-Nice Executables
-5a878bd73b3a2b5c8ba3601e67558ecc  /etc/profile.d/nix-nice-00.sh
+69ba19f1f93bb658e5d68d990663ecb7  /etc/profile.d/nix-nice-00.sh
 b47931b94bd3219734b11afeb1ffc279  /opt/nix-nice/bin/cb.sh
 262331ea901ced3c2b52ee7645ff9024  /opt/nix-nice/bin/cmphost.sh
 014025bff643a37f1b0992133866e857  /opt/nix-nice/bin/finalnewline.sh
