@@ -112,6 +112,11 @@ Command: bash-completion
 OK
 
 
+------------------------
+Command: bash-completion
+OK
+
+
 -------------
 Command: perl
 OK

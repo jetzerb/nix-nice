@@ -12,7 +12,7 @@ checkInstall "libxtst6";
 checkInstall "locales";
 
 mkdir /run/sshd;
-checkCommand 'openssh-server' 'sshd -t';
+checkCommand 'openssh-server' 'sshd -t && grep "AddressFamily.*inet" /etc/ssh/sshd_config';
 
 checkInstall "xauth";
 
@@ -52,7 +52,9 @@ checkInstall 'diffutils';
 cmd='colordiff'; checkCommand "$cmd" '$cmd <(echo "foo") <(echo "foo")';
 
 checkInstall 'bash';
-checkInstall 'bash-completion';
+cmd='bash-completion';
+checkInstall "$cmd";
+checkCommand "$cmd" 'grep -E "set\s+completion-ignore-case\s+on" /etc/inputrc';
 
 cmd='perl'; checkCommand "$cmd" '$cmd -e "print;"';
 
@@ -75,7 +77,7 @@ xslt='
 	</xsl:template>
 </xsl:stylesheet>';
 xml='<a>foo</a>';
-cmd='xsltproc'; checkCommand "$cmd" '$cmd <(echo "$xslt") <(echo "<a>foo</a>")';
+cmd='xsltproc'; checkCommand "$cmd" '$cmd <(echo "$xslt") <(echo "$xml")';
 
 json='{"a":1}';
 cmd='jq'; checkCommand "$cmd" 'echo "$json" | jq "."';
@@ -132,9 +134,9 @@ cmd='xsv';     checkCommand "$cmd" '$cmd select b $csv';
 json='{"foo": {"bar":"baz"}, "num":123}';
 cmd="gron";    checkCommand "$cmd" 'echo $json | $cmd';
 
-cmd="trdsql";  checkCommand "$cmd" '$cmd -driver sqlite3 -icsv -ih -oat "select c,b from $csv" && ls /etc/skel/.config/$cmd/config.json';
+cmd="trdsql";  checkCommand "$cmd" '$cmd -driver sqlite3 -icsv -ih -oat "select c,b from $csv" && grep "db.*sdb" /etc/skel/.config/$cmd/config.json';
 
-cmd="bat";     checkCommand "$cmd" '$cmd $csv';
+cmd="bat";     checkCommand "$cmd" '$cmd $csv && grep "iKMQRWX" /etc/skel/.config/$cmd/config';
 cmd="fd";      checkCommand "$cmd" '$cmd $csv';
 cmd="hexyl";   checkCommand "$cmd" '$cmd $csv';
 
@@ -143,7 +145,7 @@ cmd="hexyl";   checkCommand "$cmd" '$cmd $csv';
 cmd="hecate";  checkCommand "$cmd" 'TERM=xterm "$cmd" "$csv" & kill %1;'
 
 cmd="bat-extras";      checkCommand "$cmd" 'ls /opt/"$cmd"/bin/{bat,pretty}* && batgrep "." "$csv"';
-cmd="vimrc";   checkCommand "$cmd" 'dir=/etc/profile.d/vim_runtime; ls $dir/*${cmd}* && ls $dir/zz*';
+cmd="vimrc";   checkCommand "$cmd" 'dir=/etc/profile.d/vim_runtime; ls $dir/*${cmd}* && ls $dir/zz* && grep -F "~/.config/nvim/my_configs" /etc/skel/.config/nvim/init.vim';
 cmd=".tmux";   checkCommand "$cmd" '[ -f "$(realpath /etc/skel/${cmd}.conf)" ] && grep "os_clipboard=true" /etc/skel/${cmd}.conf.local';
 cmd="powerline fonts"; checkCommand "$cmd" 'ls /usr/share/fonts/truetype/dejavu/*owerline*';
 cmd="tldr";    checkCommand "$cmd" '$cmd $cmd && grep '"'"'^complete.*$(q=.*<<<.*##.*'"'"'"$cmd" /etc/skel/.bashrc';
