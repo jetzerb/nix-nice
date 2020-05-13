@@ -283,20 +283,26 @@ export TERM=dumb; \
 cd $TMP; \
 CMD=vimrc; \
 getGitHubAndLogVersion amix $CMD; \
-mv $CMD /etc/profile.d/vim_runtime; \
-mkdir -p /etc/skel/.config/nvim; \
-cd /etc/skel/.config/nvim; \
-/etc/profile.d/vim_runtime/install_awesome_parameterized.sh /etc/profile.d/vim_runtime root; \
-mv ~/.$CMD ./init.vim; \
-# point "my_configs" to user's home dir
-sed -i 's![^ ]*\(/my_configs\)!~/.config/nvim\1!;' init.vim; \
+DIR=/etc/profile.d/vim_runtime; \
+mv $CMD $DIR; \
+# **** vvvv ****
+# Work around bug introduced in 79ed228 2020-05-10
+sed -i 's/"~\/$user"/"~$user"/' $DIR/install_awesome_parameterized.sh; \
+# **** ^^^^ ****
+$DIR/install_awesome_parameterized.sh $DIR root; \
 # until git is installed permanently, move some of the awesomeness out of the way
-cd /etc/profile.d/vim_runtime; \
+cd $DIR; \
 for FILE in $(find . -type f -name '*.vim' -exec grep -il 'git.executable' {} \; | sed 's!^..\([^/]*/[^/]*\)/.*!\1!;' |sort -u); \
 do \
 	mkdir -p zz${FILE%/*}; \
 	mv $FILE zz${FILE%/*}; \
 done; \
+DIR=/etc/skel/.config/nvim; \
+mkdir -p $DIR; \
+cd $DIR; \
+mv ~/.$CMD ./init.vim; \
+# point "my_configs" to user's home dir
+sed -i 's![^ ]*\(/my_configs\)!~/.config/nvim\1!;' init.vim; \
 #
 # Install "pretty and versatile" tmux configuration
 cd $TMP; \
@@ -342,9 +348,10 @@ find . -type f -exec dos2unix {} \; ; : just in case; \
 echo "n\nn\nn\n" |./install; : answer no to the three questions asked; \
 #
 # cleanup
+dpkg -l $L >> $MANIFEST 2>&1; \
 apt-get remove -yq --purge $BUILDPKGS; \
 apt-get -yq autoremove; \
-dpkg -l $L >> $MANIFEST 2>&1; \
+rm -rf /var/lib/apt/lists/*; \
 cd /tmp; \
 rm -rf install; \
 #
