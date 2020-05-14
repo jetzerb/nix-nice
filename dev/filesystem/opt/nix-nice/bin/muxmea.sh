@@ -11,24 +11,24 @@ then
 fi;
 
 case "$1" in
-	-? | -h | -l | ls)
+	-\? | -h | -l | ls)
 		tmux ls;
 		exit 0;
 esac;
 
-for BASE in ~/src ~/hosthome/src
+for base in ~/src ~/hosthome/src
 do
-	PROJDIR=$(find $BASE -mindepth 3 -maxdepth 3 -type d -iname "*$1*" | sort -f | head -1);
-	[ -n "$PROJDIR" ] && break;
+	projdir=$(find $base -mindepth 3 -maxdepth 3 -type d -iname "*$1*" | sort -f | head -1);
+	[ -n "$projdir" ] && break;
 done;
-PROJDIR=${PROJDIR#$BASE/*/};
-SESSION=$(echo $1 |tr 'a-z' 'A-Z');
+projdir=${projdir#$base/*/};
+session=$(echo "$1" |tr '[:lower:]' '[:upper:]');
 
 # detach from any existing session first
 if [ -n "$TMUX" ]
 then
-	SESSION=$(tmux display-message -p '#{session_name}');
-	echo "Already in session '$SESSION', and it's impossible to create a sibling session.";
+	session=$(tmux display-message -p '#{session_name}');
+	echo "Already in session '$session', and it's impossible to create a sibling session.";
 	echo "Run this command again after detaching";
 	sleep 2;
 	tmux detach;
@@ -36,33 +36,31 @@ then
 fi;
 
 
-# check if session exists
-tmux has-session -t $SESSION 2>/dev/null;
-
-if [ $? != 0 ]
+# jump into existing session, or create a new one
+if tmux has-session -t "$session" 2>/dev/null
 then
-	echo "Building new session '$SESSION'";
-	EXIST=0;
-	for DIR in code review
+	echo "Attaching to existing session '$session'";
+	tmux attach -t "$session";
+else
+	echo "Building new session '$session'";
+	exist=0;
+	for dir in code review
 	do
-		for ITER in A B
+		for iter in A B
 		do
-			if [ $EXIST -eq 0 ]
+			if [ $exist -eq 0 ]
 			then
-				cd "$BASE/$DIR/$PROJDIR";
-				tmux new-session -s $SESSION -n "$DIR$ITER" -d;
-				EXIST=1;
+				cd "$base/$dir/$projdir" || exit 1;
+				tmux new-session -s "$session" -n "$dir$iter" -d;
+				exist=1;
 			else
-				tmux new-window -t $SESSION -n "$DIR$ITER" -c "$BASE/$DIR/$PROJDIR";
+				tmux new-window -t "$session" -n "$dir$iter" -c "$base/$dir/$projdir";
 			fi;
 		done;
 	done;
-	for ITER in 1 2
+	for iter in 1 2
 	do
-		tmux new-window -t $SESSION -c "$HOME";
+		tmux new-window -t "$session" -c "$HOME";
 	done;
-	tmux attach -t $SESSION \; select-window -t "codeA";
-else
-	echo "Attaching to existing session '$SESSION'";
-	tmux attach -t $SESSION;
+	tmux attach -t "$session" \; select-window -t "codeA";
 fi;
