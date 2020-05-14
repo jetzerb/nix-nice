@@ -18,7 +18,7 @@ esac;
 
 for BASE in ~/src ~/hosthome/src
 do
-	PROJDIR=$(find $BASE -mindepth 3 -maxdepth 3 -type d -iname "*$1*" | head -1);
+	PROJDIR=$(find $BASE -mindepth 3 -maxdepth 3 -type d -iname "*$1*" | sort -f | head -1);
 	[ -n "$PROJDIR" ] && break;
 done;
 PROJDIR=${PROJDIR#$BASE/*/};
