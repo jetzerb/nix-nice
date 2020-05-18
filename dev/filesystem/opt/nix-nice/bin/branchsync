@@ -21,7 +21,7 @@ EOF
 #
 
 case ${1:-} in
-	-? | -h | --help)
+	-\? | -h | --help)
 		usage;
 		exit 0 ;;
 	"") ;; # fall through to code below
@@ -43,15 +43,15 @@ git remote prune origin;
 # remove any local branches if they've been deleted in the origin
 echo "Removing local branches if they no longer exist at the origin";
 git branch -vv |
-while read BRANCH
+while read -r branch
 do
 	# if branch contains the string ": gone]", it should be deleted from the local repository
-	if [ "${BRANCH#*: gone]}" != "$BRANCH" ]
+	if [ "${branch#*: gone]}" != "$branch" ]
 	then
 		# Strip off leading "*" (appears on current branch), and any leading spaces.
 		# Then everything after the first space (i.e. get branch name only)
-		BRANCH=$(echo $BRANCH | sed 's/^[\* ]*//; s/ .*//;');
-		echo "Deleting branch '$BRANCH'";
-		git branch -d $BRANCH;
+		branch=$(echo "$branch" | sed 's/^[\* ]*//; s/ .*//;');
+		echo "Deleting branch '$branch'";
+		git branch -d "$branch";
 	fi;
 done;

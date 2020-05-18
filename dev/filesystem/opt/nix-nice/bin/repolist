@@ -1,14 +1,22 @@
 #!/bin/bash
 set -euo pipefail;
 
+while getopts 'r' opt
+do
+	case $opt in
+		r) raw=1;;
+		*) exit 1;;
+	esac;
+done;
+shift $((OPTIND - 1));
 project=${1:-};
 
 # strip the prefix off of the current working dir
-path=$(echo "$PWD" | sed 's!^.*/\(src/\)!\1!;');
+path="${PWD##*/src/}";
 
 if [ -z "$project" ]
 then
-	project=$(echo "$path" | awk -F '/' '{print $4;}');
+	project=$(echo "$path" | awk -F '/' '{print $3;}');
 fi;
 
 if [ -z "$project" ]
@@ -19,23 +27,27 @@ fi;
 
 # Figure out how to get the list of repos based on the current
 # working directory
-url=$(echo "$path" | awk -F '/' '{sub("=","/",$3); print $3;}');
+url=$(echo "$path" | awk -F '/' '{sub("=","/",$2); print $2;}');
 
-echo "Repos at '$url' for project/user '$project'";
+if [ -z "${raw:-}" ]
+then
+	echo "Repos at '$url' for project/user '$project'";
+	output_fmt="-oat";
+else
+	output_fmt="-ocsv -od $(printf "\x1f")";
+fi;
 
 case "$url" in
 	dev.azure.com/*)
-		az repos list --project "$project" |
-		jq '.[] | {isFork, name}' |
-		trdsql -ijson -oat 'select isFork, name from - order by isFork, name'
-		;;
+		az repos list --project "$project" --organization "https://$url" \
+			--query '[*].{fork: isFork, name: name, size: size, created_at: null, updated_at: null, description: null}';;
 	github.com)
-		curl -s https://api.github.com/users/"$project"/repos |
-		trdsql -driver sqlite3 -ijson -oat '
-			select fork, name, created_at, updated_at, description
-			from -
-			order by fork, name'
-		;;
+		curl -s https://api.github.com/users/"$project"/repos;;
 	*)
-		echo "Unhandled source control provider: '$url'";;
-esac;
+		echo "Unhandled source control provider: '$url'"
+		exit 1;;
+esac |
+trdsql -driver sqlite3 -ijson $output_fmt '
+	select fork, size, name, created_at, updated_at, description
+	from -
+	order by fork, name';

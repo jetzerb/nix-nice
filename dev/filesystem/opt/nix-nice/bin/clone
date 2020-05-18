@@ -20,7 +20,7 @@ urlencode() {
 	for (( i = 0; i < length; i++ )); do
 		local c="${1:i:1}"
 		case $c in
-			[a-zA-Z0-9.~_-]) printf "$c" ;;
+			[a-zA-Z0-9.~_-]) printf "%s" "$c" ;;
 			*) printf '%%%02X' "'$c" ;;
 		esac
 	done
@@ -29,32 +29,28 @@ urlencode() {
 
 
 # Get context from present working directory
-PROJECT=$(basename "$PWD");
-PROJECT=$(urlencode "$PROJECT");
+project=$(basename "$PWD");
+project=$(urlencode "$project");
 
-URL=$(basename $(dirname "$PWD"));
+url=$(basename "$(dirname "$PWD")");
 
-USER=${URL#*=};
-URL=${URL%%=*};
-URL=$(urlencode "$URL");
-if [ "$URL" != "$USER" ]
+user=${url#*=};
+url=${url%%=*};
+url=$(urlencode "$url");
+if [ "$url" != "$user" ]
 then
-	USER=$(urlencode "$USER");
-	URL="$URL/$USER";
+	user=$(urlencode "$user");
+	url="$url/$user";
 fi;
-URL="https://$URL";
+url="https://$url";
 
 # get the name of the repo to clone
-REPO=$(urlencode "$1");
+repo=$(urlencode "$1");
 
-case $URL in
-	https://github.com)
-		git clone $URL/$PROJECT/${REPO}.git ;;
+case $url in
 	https://dev.azure.com/*)
-		git clone $URL/$PROJECT/_git/$REPO ;;
+		git clone "$url/$project/_git/$repo" ;;
 	*)
-		echo "Oops.  Can't seem to figure this out.";
-		echo "	URL:     $URL";
-		echo "	Project: $PROJECT";
-		echo "	Repo:    $REPO";
+		# assume everyone else does it like github
+		git clone "$url/$project/${repo}.git" ;;
 esac;

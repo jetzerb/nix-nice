@@ -6,8 +6,8 @@ usage () {
 	cat <<EOF >&2
 $(
 	case "$@" in
-		-"?"|*-help) ;;
-		*)	echo "Invalid input encountered at [$@]";;
+		-\? | *-help) ;;
+		*)	echo "Invalid input encountered at$(printf " %s" "$@")";;
 	esac;
 )
 Output summary statistics about each branch matching the specified pattern.

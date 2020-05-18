@@ -2,35 +2,24 @@
 set -euo pipefail;
 IFS=$'\n\t';
 
-PROJECT=$(basename "$PWD");
-URL=$(basename $(dirname "$PWD"));
-
-echo "Refreshing all repos for URL '$URL', project / user '$PROJECT'";
-case "$URL" in
-	github.com)
-		curl -s https://api.github.com/users/"$PROJECT"/repos;;
-	dev.azure.com*)
-		az repos list --project "$PROJECT";;
-	*)
-		echo '[{"name": "<Unknown Source Control Provider>"}]';;
-esac |
-jq -r 'sort_by(.name) | .[] .name' |
-while read REPO
+repolist -r |
+awk -F "$(printf "\x1f")" '{print $3;}' |
+while read -r repo
 do
-	echo -e "\n-------> $REPO";
-	DIR=$(urlencode.sh $REPO);
-	if [ ! -d "$DIR" ]
+	echo -e "\n-------> $repo";
+	dir=$(urlencode "$repo");
+	if [ ! -d "$dir" ]
 	then
-		echo "Cloning $REPO";
-		clone.sh "$REPO";
+		echo "Cloning $repo";
+		clone "$repo";
 	fi;
-	cd "$DIR";
-	MAIN=$(git branch -r | sed -n '/HEAD/ {s!.*/!!; p;}');
-	if [ -z "$MAIN" ]
+	cd "$dir";
+	main=$(git branch -r | sed -n '/HEAD/ {s!.*/!!; p;}');
+	if [ -z "$main" ]
 	then
 		echo "!!!! No Remote Branches !!!!";
 	else
-		git checkout $MAIN || true;
+		git checkout "$main" || true;
 		git pull || true;
 	fi;
 	cd ..;

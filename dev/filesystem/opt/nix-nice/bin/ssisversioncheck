@@ -2,9 +2,11 @@
 IFS=$'\n\t';
 set -euo pipefail;
 
+# Compare version info from inidividual SSIS packages with the version listed
+# in the project file
 
 # XSLT to dump out the name and version info for a project
-read -r -d '' pkgXSLT <<'EOF' || true
+read -r -d '' pkg_xslt <<'EOF' || true
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xsl:stylesheet version="1.0"
@@ -31,7 +33,7 @@ EOF
 
 
 # XSLT to dump out package names and version info from the projectfile
-read -r -d '' prjXSLT <<'EOF' || true
+read -r -d '' proj_xslt <<'EOF' || true
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xsl:stylesheet version="1.0"
@@ -56,22 +58,18 @@ read -r -d '' prjXSLT <<'EOF' || true
 </xsl:stylesheet>
 EOF
 
-diff=$(
-	(
-		xsltproc <(echo "$pkgXSLT") *.dtsx   | sed 's/^/pkg\t/';
-		xsltproc <(echo "$prjXSLT") *.dtproj | sed 's/^/prj\t/'
-	) | trdsql -icsv -id '\t' -oh "
-	select src.c2 as PackageName
-	      ,pkg.c3 as PkgBuild
-	      ,case when prj.c3 = pkg.c3 then '-same-' else prj.c3 end as PrjBuild
-	      ,pkg.c4 as PkgGUID
-	      ,case when prj.c4 = pkg.c4 then '-same-' else prj.c4 end as PrjGUID
-	from (select distinct c2 from - ) src
-	     left join - pkg on pkg.c1 = 'pkg' and pkg.c2 = src.c2
-	     left join - prj on prj.c1 = 'prj' and prj.c2 = src.c2
-	where pkg.c1 is null or prj.c1 is null
-	   or pkg.c3 <> prj.c3
-	   or pkg.c4 <> prj.c4";
-);
-
-echo "$diff" | trdsql -ih -oat 'select * from -';
+(
+	xsltproc <(echo "$pkg_xslt") ./*.dtsx   | sed 's/^/pkg\t/';
+	xsltproc <(echo "$proj_xslt") ./*.dtproj | sed 's/^/prj\t/'
+) | trdsql -icsv -id '\t' -oh -oat "
+select src.c2 as PackageName
+      ,pkg.c3 as PkgBuild
+      ,case when prj.c3 = pkg.c3 then '-same-' else prj.c3 end as PrjBuild
+      ,pkg.c4 as PkgGUID
+      ,case when prj.c4 = pkg.c4 then '-same-' else prj.c4 end as PrjGUID
+from (select distinct c2 from - ) src
+     left join - pkg on pkg.c1 = 'pkg' and pkg.c2 = src.c2
+     left join - prj on prj.c1 = 'prj' and prj.c2 = src.c2
+where pkg.c1 is null or prj.c1 is null
+   or pkg.c3 <> prj.c3
+   or pkg.c4 <> prj.c4";
