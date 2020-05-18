@@ -3,27 +3,27 @@ set -euo pipefail;
 IFS=$'\n\t';
 
 #
-# ensure that each text file has an EOL on the final line
+# ensure that each text file has an eol on the final line
 #
 
-TOT=0;
-UPD=0;
+cnt_tot=0;
+cnt_upd=0;
 
-for FILE in $@
+for file in "$@"
 do
-	TOT=$((TOT+1));
-	EOL=$(tail -c4 "$FILE" | od -tx1 -A none);
-	case "$EOL" in
+	cnt_tot=$((cnt_tot+1));
+	eol=$(tail -c4 "$file" | od -tx1 -A none);
+	case "$eol" in
 		*0[ad] | *0[ad]" 00")
 			continue ;; # file already has trailing CR/LF
 	esac;
 
-	UPD=$((UPD+1));
-	echo "$UPD. Updating $FILE";
+	cnt_upd=$((cnt_upd+1));
+	echo "$cnt_upd. Updating $file";
 
 	# get the correct end of line chars based on the first line in the file
-	EOL=$(
-		head -1 "$FILE" |
+	eol=$(
+		head -1 "$file" |
 		tail -c4 |
 		od -tc -A none |
 		sed '
@@ -31,13 +31,13 @@ do
 			s/^\(\\0\)\(.*\)/\2\1/;  # move leading zero to the back, where head did not include it
 		    ';
 	);
-	case "$EOL" in
-		    "") EOL="\n"  ; echo "    No EOL chars; defaulting to $EOL";;
-		"\0\0") EOL="\n\0"; echo "    No EOL chars; defaulting to $EOL";;
-		     *)             echo "    Using $EOL (found on line 1 of file)";;
+	case "$eol" in
+		    "") eol="\n"  ; echo "    No eol chars; defaulting to $eol";;
+		"\0\0") eol="\n\0"; echo "    No eol chars; defaulting to $eol";;
+		     *)             echo "    Using $eol (found on line 1 of file)";;
 	esac;
 
-	echo -en $EOL >> "$FILE";
+	echo -en $eol >> "$file";
 done;
 
-echo "Updated $UPD of $TOT files examined";
+echo "Updated $cnt_upd of $cnt_tot files examined";

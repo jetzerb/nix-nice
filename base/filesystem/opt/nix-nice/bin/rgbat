@@ -3,7 +3,7 @@
 usage() {
 	cat <<EOF
 
-$(basename $0) <regex>
+$(basename "$0") <regex>
 
 Browse through files identified by "ripgrep" that contain the specified
 pattern, using "bat", and automatically highlighting the pattern.
@@ -19,8 +19,8 @@ esac;
 
 # Do it in a subshell so as to not disturb environment variables
 (
-	IFS=$(/bin/echo -e "\n\t");  # handle filenames with spaces
+	IFS=$(printf "\n\t");  # handle filenames with spaces
 
-	FILES=$(rg -il "$1");
-	[ -n "$FILES" ] && bat --pager='/usr/bin/less -iKMQRWXp "'$1'"' $FILES;
+	files=$(rg -il "$1");
+	[ -n "$files" ] && bat --pager='/usr/bin/less -iKMQRWXp "'"$1"'"' "$files";
 );
