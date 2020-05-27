@@ -62,10 +62,7 @@ TMP=/tmp/install; \
 mkdir -p $TMP; \
 #
 # Azure CLI
-# NOTE: Not yet available for 20.04, so install latest version available
-#       and create a link to satisfy the libffi dependency
-curl -sL https://aka.ms/InstallAzureCLIDeb | sed 's/${CLI_REPO}/eoan/g;' | bash; \
-/opt/nix-nice/sbin/make-lib-links /lib/x86_64-linux-gnu/libffi; \
+curl -sL https://aka.ms/InstallAzureCLIDeb | bash; \
 #
 #
 # Azure Data Studio
