@@ -51,7 +51,7 @@ ii  sc              7.16-4ubuntu3                amd64        Text-based spreads
 ii  sudo            1.8.31-1ubuntu1              amd64        Provide limited super user privileges to specific users
 ii  tmux            3.0a-2                       amd64        terminal multiplexer
 ii  tree            1.8.0-1                      amd64        displays an indented directory tree, in color
-ii  tzdata          2019c-3ubuntu1               all          time zone and daylight-saving time data
+ii  tzdata          2020a-0ubuntu0.20.04         all          time zone and daylight-saving time data
 ii  wget            1.20.3-1ubuntu1              amd64        retrieves files from the web
 ii  xauth           1:1.1-0ubuntu1               amd64        X authentication utility
 ii  xclip           0.13-1                       amd64        command line interface to X selections
@@ -62,20 +62,20 @@ toybox 0.8.3
 bitwise v0.41
 xsv 0.13.0
 gron version 0.6.0
-trdsql trdsql version v0.7.5
-bat-extras - f20a3ff - 2020-05-12 02:36:48 -0700
+trdsql trdsql version v0.7.6
+bat-extras - 3029b67 - 2020-05-15 21:13:15 -0700
 vimrc - 1d312d3 - 2020-05-10 11:06:29 -0400
 .tmux - 2e40091 - 2020-04-21 14:56:12 -0500
 fonts - e80e3eb - 2018-11-11 15:22:30 +0300
  tldr-bash-client version 0.45  http://gitlab.com/pepa65/tldr-bash-client
-fzf - e6d33f7 - 2020-04-24 15:56:55 +0200
+fzf - f81feb1 - 2020-05-23 20:51:41 +0900
 Desired=Unknown/Install/Remove/Purge/Hold
 | Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
 |/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
 ||/ Name           Version      Architecture Description
 +++-==============-============-============-=============================================================================
-ii  bat            0.15.1       amd64        A cat(1) clone with wings.
-ii  fd             8.0.0        amd64        Simple, fast and user-friendly alternative to find
+ii  bat            0.15.4       amd64        A cat(1) clone with wings.
+ii  fd             8.1.1        amd64        Simple, fast and user-friendly alternative to find
 ii  hecate         0.0.1        amd64        ?
 ii  hexyl          0.7.0        amd64        A command-line hex viewer.
 ii  ripgrep        12.1.0       amd64        ripgrep is a line-oriented search tool that recursively searches your current
@@ -96,7 +96,7 @@ ii  howdoi               1.1.9-1               all          command line tool fo
 ii  libc++1:amd64        1:10.0-50~exp1        amd64        LLVM C++ Standard library
 ii  libnotify4:amd64     0.7.9-1ubuntu2        amd64        sends desktop notifications to a notification daemon
 ii  libnss3:amd64        2:3.49.1-1ubuntu1     amd64        Network Security Service libraries
-ii  libsecret-1-0:amd64  0.20.2-1              amd64        Secret store
+ii  libsecret-1-0:amd64  0.20.3-0ubuntu1       amd64        Secret store
 ii  libxkbfile1:amd64    1:1.1.0-1             amd64        X11 keyboard file manipulation library
 ii  libxss1:amd64        1:1.2.3-1             amd64        X11 Screen Saver extension library
 ii  nodejs               10.19.0~dfsg-3ubuntu1 amd64        evented I/O for V8 javascript - runtime executable
@@ -112,15 +112,15 @@ flk - 71e9710 - 2020-04-29 21:08:27 +0800
 usql 0.7.8
 migra - 964aa8a - 2020-05-08 20:06:48 +1000
 v3.1.8-postman.5
-newman 5.0.0
+newman 5.0.1
 bash-git-prompt - 148d502 - 2019-11-17 07:17:07 -0500
 Desired=Unknown/Install/Remove/Purge/Hold
 | Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
 |/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
 ||/ Name           Version           Architecture Description
 +++-==============-=================-============-=========================================================
-ii  code           1.45.0-1588868285 amd64        Code editing. Redefined.
-ii  dbeaver-ce     7.0.4             amd64        DBeaver Community
+ii  code           1.45.1-1589445302 amd64        Code editing. Redefined.
+ii  dbeaver-ce     7.0.5             amd64        DBeaver Community
 ii  git-delta      0.1.1             amd64        A syntax highlighter for git.
 ii  osquery        4.1.1-1.linux     amd64        osquery is an operating system instrumentation toolchain.
 
@@ -142,7 +142,7 @@ Desired=Unknown/Install/Remove/Purge/Hold
 |/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
 ||/ Name            Version           Architecture Description
 +++-===============-=================-============-=================================
-ii  azuredatastudio 1.17.1-1588204741 amd64        Azure Data Studio
+ii  azuredatastudio 1.18.0-1589932572 amd64        Azure Data Studio
 
 
 
@@ -169,24 +169,23 @@ e0c542fc0eef2989cf9c3607252d901c  /etc/profile.d/nix-nice-10-dev.sh
 551bbae52b1131b873e85e934c03aa4d  /etc/profile.d/nix-nice-20-azure.sh
 9538bb8dab4813e0d65eb01b738a04e5  /opt/nix-nice/bin/bomadd
 692c02ab68ca682fb3d9c801c87a81c2  /opt/nix-nice/bin/bomrm
-4fce2989934919344587a62e9675f4a9  /opt/nix-nice/bin/branchlist
-c8cbc86709f24d0c9ec1d0e5cfdbbda0  /opt/nix-nice/bin/branchsync.sh
-b47931b94bd3219734b11afeb1ffc279  /opt/nix-nice/bin/cb.sh
-1870ea54da9224190520903217f17e24  /opt/nix-nice/bin/clone.sh
+85e20c8beb63d06990b4ff6d8b3a76db  /opt/nix-nice/bin/branchlist
+83993b6f32c9f6fbb8f57429f0a334e2  /opt/nix-nice/bin/branchsync
+ffa472324e016429350f5822129aa7eb  /opt/nix-nice/bin/cb
+1ade02b34619d0622855ca9ac1a4768d  /opt/nix-nice/bin/clone
 262331ea901ced3c2b52ee7645ff9024  /opt/nix-nice/bin/cmphost.sh
-014025bff643a37f1b0992133866e857  /opt/nix-nice/bin/finalnewline.sh
-5df83717da9ead0b27d2e5cbaa14fdaa  /opt/nix-nice/bin/gitfind.sh
-0d6d7e8feef8173789eef8584b72d5a7  /opt/nix-nice/bin/gitgrep.sh
-b451984f397171ec94b984017879cd4e  /opt/nix-nice/bin/muxmea.sh
-0935dce75c764bbf91a1a8e9e971332b  /opt/nix-nice/bin/projectfilereconcile.sh
-41d1f50b65da231febedb1bc176070c6  /opt/nix-nice/bin/repolist.sh
-835e03bafe9e71c322ffeaaacc3818fc  /opt/nix-nice/bin/reporefresh.sh
-b150b993ef38d968f32739543f33c414  /opt/nix-nice/bin/repostatus.sh
-c492adf682546250125faf50a8956e06  /opt/nix-nice/bin/rgbat.sh
-2656f5a66f744b29f38bf40946f980df  /opt/nix-nice/bin/ssisversioncheck.sh
-a886f411fb0fe2f1d21a1d4236d71881  /opt/nix-nice/bin/submodsetup.sh
-0a4cce7f36cc2945ef0dd50b6d4b0ca8  /opt/nix-nice/bin/urlencode.sh
-989ca42bf116f94d62b55ef3bf1fe04a  /opt/nix-nice/etc/manifest.txt
+457c1719dbaa0996aec1deacef5c848b  /opt/nix-nice/bin/finalnewline
+0fd34e661205fcac3757c7e92902a7ad  /opt/nix-nice/bin/gitfind
+4b42a5ebfec9e4661799d600d947122e  /opt/nix-nice/bin/gitgrep
+2859d6a6cd8904024816e947d83a660c  /opt/nix-nice/bin/muxmea
+b0cc364f9b4e81ea22a1d2e8b8471a82  /opt/nix-nice/bin/projectfilereconcile
+6b7a18bf8e6f20107d2bb3d6f64c4bf8  /opt/nix-nice/bin/repolist
+4b11c3e3bd95e432dfdb8d2609dab23b  /opt/nix-nice/bin/reporefresh
+b82a80c671bdcda6587e9afbe520cd23  /opt/nix-nice/bin/rgbat
+3a5c13e862c1001732a220170d85826e  /opt/nix-nice/bin/ssisversioncheck
+a886f411fb0fe2f1d21a1d4236d71881  /opt/nix-nice/bin/submodsetup
+66ca30d37cdca8e76689d17a5ad6149b  /opt/nix-nice/bin/urlencode
+fd2a85be0bd0a4a666302a95c22ff0fc  /opt/nix-nice/etc/manifest.txt
 99bc826296648cd70d69fcbde10ed1c0  /opt/nix-nice/sbin/container-startup.sh
 e52f1985db56e490f481bf76bcc9d574  /opt/nix-nice/sbin/create-links.sh
 b4019911b8e5ed90e0103e5f463993b5  /opt/nix-nice/sbin/create-users.sh
