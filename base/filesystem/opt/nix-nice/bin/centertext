@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+IFS=$'\n\t';
+set -euo pipefail;
+
+
+#
+# center a string of text.
+#
+
+line="${1:-}";
+echo "$line" | pr -To $(( (${2:-80} - ${#line}) / 2 ));

@@ -120,31 +120,14 @@ done;
 popd >/dev/null || echo "Unable to pop directory";
 
 
-#
-# function to print a nice header.  frequently comes in handy
-mkhdr() {
-	echo "$*" | sed '{h; s/./-/g; s/^/\n\n/; p; x;}';
-}
-
-#
-# function to center a string of text.
-center() {
-	line="${1:-}";
-	echo "$line" | pr -To $(( (${2:-80} - ${#line}) / 2 ));
-}
-
-#
-# function to center a string of text
 
 #
 # cd up a few directories
 #   blank = toplevel of current git repo, or home dir if not in a git repo
 #       ^ = same as above
 #      ^^ = out of repo, to project/user dir
-#     ^^^ = out of project/user dir to source control provider dir
-#    ^^^^ = out of source control provider dir to code/review dir
-#   ^^^^^ = out of code/review dir to parent source dir
-#  ^^^^^^ = out of parent source dir to whatever is above that
+#     ^^^, ^^^^, etc up one more directory
+#
 #       % = current folder, but toggle between "Code" and "Review" dirs/workspaces
 #       $ = current folder, but toggle between container & hosthome
 #       n = up "n" levels where n is an integer
@@ -152,58 +135,57 @@ center() {
 #
 # if another parameter is specified, cd to that dir after performing the above actions
 #
+# Note: must be a function rather than a script, because scripts execute in a subshell
+# and can't affect your working directory
+#
+unalias ud 2>/dev/null;
 ud() {
-	local TGT I SUB;
 	case "$1" in
-		("" | ^ | ^^ | ^^^ | ^^^^ | ^^^^^ | ^^^^^^)
+		"" | ^*)
 			# up to top of repo
-			TGT=$(git rev-parse --show-toplevel 2> /dev/null);
-			TGT=${TGT:-$HOME}; # or home dir if not in a repo
-			I=${#1};
-			while [ "$I" -gt 1 ]
-			do
-				TGT=$TGT/..;  # back up one more dir for each extra ^
-				I=$((I-1));
-			done;
+			tgt=$(git rev-parse --show-toplevel 2> /dev/null);
+			tgt=${tgt:-$HOME}; # or home dir if not in a repo
+			up=${1:1}; # remove first ^
+			tgt=$tgt${up//^/\/..}; # go up one level for every ^
 			;;
 		%)
 			case "$PWD" in
-				$HOME/src/code/*   | $HOME/hosthome/src/code/*)
-					TGT=${PWD/\/code\//\/review\/};;
-				$HOME/src/review/* | $HOME/hosthome/src/review/*)
-					TGT=${PWD/\/review\//\/code\/};;
+				*/src/code/*)
+					tgt=${PWD/\/code\//\/review\/};;
+				*/src/review/*)
+					tgt=${PWD/\/review\//\/code\/};;
 				*)
-					TGT=$PWD;;
+					tgt=$PWD;;
 			esac;;
 		$)
 			case "$PWD" in
 				$HOME/hosthome | $HOME/hosthome/*)
-				        TGT=${PWD/\/hosthome/};;
-				$HOME*) TGT=${PWD/$HOME/$HOME\/hosthome};;
-				*)      TGT=$PWD;;
+				        tgt=${PWD/\/hosthome/};;
+				$HOME*) tgt=${PWD/$HOME/$HOME\/hosthome};;
+				*)      tgt=$PWD;;
 			esac;;
-		([0-9] | [0-9][0-9]) # move up "n" dirs
-			TGT=$PWD;
-			I=$1;
-			while [ "$I" -gt 0 ]
+		[0-9]*) # move up "n" dirs
+			tgt=$PWD;
+			up=$1;
+			while [ "$up" -gt 0 ]
 			do
-				TGT=${TGT%/*}; # remove final "/dirname" from path
-				I=$((I-1));
+				tgt=${tgt%/*}; # remove final "/dirname" from path
+				up=$((up-1));
 			done;
 			;;
-		(- | ~)
-			TGT=$1; # pass through commonly used cd idioms
+		- | ~)
+			tgt=$1; # pass through commonly used cd idioms
 			;;
 		*)
 			# back up to dir containing the specified pattern
-			TGT=$(echo "$PWD/" | sed 's/\(.*'"${1//\//\\/}"'[^\/]*\)\/.*/\1/;')
+			tgt=$(echo "$PWD/" | sed 's/\(.*'"${1//\//\\/}"'[^\/]*\)\/.*/\1/;')
 			;;
 	esac;
 	shift;
 
-	SUB="$*";
-	[ -n "$SUB" ] && [ "${SUB:1:1}" != "/" ] && SUB="/$SUB";
-	eval 'cd '"'$TGT'$SUB";  # use eval so globbing works
+	sub="$*";
+	[ -n "$sub" ] && [ "${sub:1:1}" != "/" ] && sub="/$sub";
+	eval 'cd '"'$tgt'$sub";  # use eval so globbing works
 }
 
 
@@ -215,7 +197,7 @@ export BROWSER=www-browser;
 
 # Set environment variables for each non-printable ASCII character
 # except for 0x00 (ASCII_NUL) because it's the string terminator
-ascii=$(echo "
+ascii_cmd=$(echo "
 	SOH 01	start of heading
 	STX 02	start of text
 	ETX 03	end of text

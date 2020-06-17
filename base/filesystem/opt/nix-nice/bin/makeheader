@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+IFS=$'\n\t';
+set -euo pipefail;
+
+
+#
+# print a nice header.  frequently comes in handy
+#
+
+echo "$*" | sed '{h; s/./-/g; s/^/\n\n/; p; x;}';
