@@ -15,7 +15,7 @@ IFS=$'\n\t';
 # *jetzerb 2018-02-20 created
 #
 
-pattern="$1"; # pattern specified by the caller
+pattern="$1"; # filename regex pattern specified by the caller
 
 tab=$(echo -ne "\t");  # delimiter for sort later on
 prevhash="";           # when printing, need to know
@@ -32,8 +32,9 @@ cd "$(git rev-parse --show-toplevel)";
 
 for branch in $(git branch -a --format="%(refname)" |sed 's!^refs/[^/][^/]*/!!')
 do
-	result=$(git ls-tree -r  --full-name "$branch" | (grep -iE "$pattern" || true) | sed 's/^[^ ]* [^ ]* //');
-	[ -n "$result" ] && result+="\t$branch";
+	git ls-tree -r  --full-name "$branch" |
+	awk -v branch="$branch" -v ptn="$pattern" -F "\t" '
+		tolower($2) ~ tolower(ptn) {sub(/.* /,"",$1); print $1 FS $2 FS branch;}'
 done |
 sort -t "$tab" -k 2,2 -k 1,1 -k 3,3 |
 while read -r -a info
