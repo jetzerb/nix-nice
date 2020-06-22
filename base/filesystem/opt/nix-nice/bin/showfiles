@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+
+# Show list of files whose names match the specified regex
+# along with file info and contents
+
+fd "$@" |
+fzf --preview '
+stat {};
+file -b {};
+if [ -f {} ]
+then
+	case "$(file "$(realpath {})" -b --mime-encoding 2>/dev/null)" in
+		binary) hexyl {};;
+		     *) bat --color=always {};;
+	esac;
+fi;' \
+    --preview-window right:70% \
+    --bind 'alt-j:preview-down,alt-k:preview-up,alt-f:preview-page-down,alt-b:preview-page-up';
