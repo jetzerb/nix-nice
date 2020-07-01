@@ -66,7 +66,7 @@ mkHdr() {
 # jump to top of the repo, and find all directories containing a project file
 repodir=$(git rev-parse --show-toplevel);
 echo "Checking Project Files Under $repodir";
-dirname "$(find "$repodir" -iname '*.*proj')" 2>/dev/null |
+find "$repodir" -iname '*.*proj' -exec dirname {} \; 2>/dev/null |
 sort -u |
 while read -r dir
 do

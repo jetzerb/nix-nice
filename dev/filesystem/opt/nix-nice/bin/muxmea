@@ -50,8 +50,7 @@ else
 		do
 			if [ $exist -eq 0 ]
 			then
-				cd "$base/$dir/$projdir" || exit 1;
-				tmux new-session -s "$session" -n "$dir$iter" -d;
+				tmux new-session -s "$session" -n "$dir$iter" -d -c "$base/$dir/$projdir";
 				exist=1;
 			else
 				tmux new-window -t "$session" -n "$dir$iter" -c "$base/$dir/$projdir";
