@@ -22,5 +22,5 @@ esac;
 	IFS=$(printf "\n\t");  # handle filenames with spaces
 
 	files=$(rg -il "$1");
-	[ -n "$files" ] && bat --pager='/usr/bin/less -iKMQRWXp "'"$1"'"' "$files";
+	[ -n "$files" ] && bat --pager='/usr/bin/less -iKMQRWXp "'"$1"'"' $files;
 );
