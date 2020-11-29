@@ -4,6 +4,6 @@
 rm -rf fs;
 
 # run tests
-./test-container.sh
+./test-container.sh "${1:-unspecified-image-name}";
 
 echo "Post-Build Hook End DateTime: $(date)";
