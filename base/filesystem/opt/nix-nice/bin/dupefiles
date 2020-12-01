@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+IFS=$'\n\t';
+set -euo pipefail;
+
+#
+# Scan files in this directory and show
+# - Repeated filenames, along with their md5 hash and path
+# - Repeated md5 hashes, along with their filenames and path
+
+fd -t f "$@" |
+while read -r file
+do
+	md5sum "$file";
+done |
+awk '{
+	hash=$1;
+	$1 = "";
+	sub(/^  */,"");
+	file=$0;
+	if (file ~ "/") {
+		sub(/.*\//,"",file);
+		dir = substr($0,1,length($0) - length(file) - 1);
+	}
+	else {dir = ".";}
+
+	for (i = 0; i <= 1; i++) {
+		list[hash] = list[hash] (list[hash] ? "\n" : "") sprintf("%s\t%s\t%s", hash, file, dir);
+		tmp = hash; hash = file; file = tmp;
+	}
+}
+END {
+	for (key in list) {
+		if (list[key] ~ "\n") {print list[key];}
+	}
+}' |
+LC_COLLATE=C.UTF-8 sort --ignore-case -k 1,1 |
+awk '
+$1 != key {printf("\n%s\n",$1); key = $1; val = "";}
+$2 != val {printf("\t%s\n",$2);           val = $2;}
+          {printf("\t\t%s\n",$3);}
+';

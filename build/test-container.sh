@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
 
-project="$(../util/get-repo-name --full)";
-
-image=$(dirname "$0");
-image=$(cd "$image"; pwd);
-image=${image##*/};
-
-image="$project:$image-latest";
+image="${1:-unspecified-image-name}";
 
 # pull out the container manifest
 echo "$(date +'%Y-%m-%d %H:%M:%S.%N'): Extracting software manifest";

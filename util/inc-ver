@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+IFS=$'\n\t';
+set -euo pipefail;
+
+
+tag="${1:-}";
+
+if [ -z "$tag" ]
+then
+	edition=${PWD##*/};
+	tag=$(git log --format='%D' | sed -n "/^tag: $edition-/I {s/.* //; p;q;}" || true);
+fi;
+
+
+git log --format='%s' "$tag"..HEAD |
+awk -v ver="$tag" '
+BEGIN {
+	pfx = tolower(ver);
+	sub(/-.*/,"",pfx);
+	sub(/.*-v/,"",ver);
+}
+{$0 = tolower($0);}
+$0 ~ pfx ".1"                 {maj++;}
+$0 ~ pfx ".2" && !maj         {min++;}
+$0 ~ pfx ".3" && !maj && !min {bld++;}
+END {
+	split(ver,sem,".");
+	sem[1] += maj;
+	sem[2]  = maj       ? min : sem[2] + min;
+	sem[3]  = maj + min ? bld : sem[3] + bld;
+	printf("%s-v%d.%d.%d",pfx,sem[1],sem[2],sem[3]);
+}'

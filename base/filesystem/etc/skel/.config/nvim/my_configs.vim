@@ -33,3 +33,11 @@ set smartcase
 
 " if we don't highlight the current line, neovim under SmarTTY behaves badly
 set cursorline
+
+
+" amix/vimrc's 'basic' vimrc maps 0 to ^, which means that to go to the actual
+" beginning of the line you have to use 'g0' or '|' or '1|'.  I prefer to keep
+" the original/expected vim behavior:
+"   0 goes to the beginning of the line
+"   ^ goes to the first non-blank character on the line
+unmap 0

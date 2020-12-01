@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+IFS=$'\n\t';
+set -euo pipefail;
+
+
+# ensure the provided tag has the correct format
+tag="${1:-}";
+
+edition=${PWD##*/};
+
+if ! (echo "$tag" | grep -E "^${edition}-v[0-9]+\.[0-9]+\.[0-9]+$" >/dev/null)
+then
+	printf "%s: Invalid tag '%s' provided; expected %s-vN.N.N\n" "${0##*/}" "$tag" "$edition" >&2;
+	exit 1;
+fi;
+
+
+# ensure that only the appropriate files are modified
+expected=(manifest test-results);
+regex=$(printf "|%s" "${expected[@]}";);
+regex="^ *M *$edition/(${regex:1})\.txt";
+
+if (git status --porcelain | grep -vE "$regex")
+then
+	printf "Unexpected files have been modified!\n" >&2;
+	exit 1;
+elif ! (git status --porcelain | grep -E "$regex")
+then
+	printf "None of the expected files have been modified!\n" >&2;
+	exit 1;
+fi;
+
+
+for file in "${expected[@]}"
+do
+	git add "${file}.txt";
+done;
+git commit -m "Auto-committed files via build pipeline";
+git tag -a "$tag" -m "Auto-created tag via build pipeline";

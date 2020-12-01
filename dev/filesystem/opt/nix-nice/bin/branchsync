@@ -33,12 +33,7 @@ esac;
 
 # fetch from origin and prune any local tracking references if they don't
 # exist on the server
-echo "fetching info from origin";
-git fetch -p origin;
-
-# remove references in local repo if they no longer exist in the origin
-echo "Removing references to deleted branches";
-git remote prune origin;
+git fetch --all --prune;
 
 # remove any local branches if they've been deleted in the origin
 echo "Removing local branches if they no longer exist at the origin";
@@ -52,6 +47,6 @@ do
 		# Then everything after the first space (i.e. get branch name only)
 		branch=$(echo "$branch" | sed 's/^[\* ]*//; s/ .*//;');
 		echo "Deleting branch '$branch'";
-		git branch -d "$branch";
+		git branch -d "$branch" || printf "\n\n";
 	fi;
 done;
