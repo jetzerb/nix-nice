@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
+IFS=$'\n\t';
+set -euo pipefail;
 
 #
 # Build the Docker container image.
@@ -22,7 +24,17 @@ echo "Building Image $IMAGE_NAME";
 hooks/pre_build "$IMAGE_NAME";
 
 # now build the image
-docker build -t "$IMAGE_NAME" .;
+latest="${IMAGE_NAME%%-v*}-latest";
+docker build -t "$IMAGE_NAME" -t "$latest" .;
 
-# do any cleanup work
+# do any testing and cleanup work
 hooks/post_build "$IMAGE_NAME";
+
+# Commit updated manifest and test results, and tag the code
+../util/commit-and-tag "$CACHE_TAG";
+
+# Push the images (requires user to enter username & password)
+docker login;
+docker push "$IMAGE_NAME";
+docker push "$latest";
+docker logout;
