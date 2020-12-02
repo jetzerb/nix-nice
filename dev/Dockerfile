@@ -51,6 +51,8 @@ P="$P libxkbfile1"; \
 P="$P libsecret-1-0"; \
 P="$P libxss1"; \
 P="$P libnss3"; \
+P="$P libgbm1"; \
+P="$P libxcb-dri3-0"; \
 #
 # DBeaver pre-requisites
 P="$P default-jre-headless"; \
@@ -144,7 +146,7 @@ $DIR/$CMD -V >> $MANIFEST 2>&1; \
 cd $TMP; \
 CMD=osquery; \
 URL=$GITHUB/$CMD/$CMD/releases; \
-wget -nv -O $CMD.deb $(lynx --dump $URL | sed -n '/[0-9][0-9]*\. https.*deb/ {s/.*https/https/; p; q;}'); \
+wget -nv -O $CMD.deb $(lynx --dump $URL | sed -n '/[0-9][0-9]*\. https.*'"$CMD"'.[0-9].*deb/ {s/.*https/https/; p; q;}'); \
 dpkg -i $CMD.deb; \
 L="$L $CMD"; \
 #
