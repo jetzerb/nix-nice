@@ -18,15 +18,30 @@ BEGIN {
 	pfx = tolower(ver);
 	sub(/-.*/,"",pfx);
 	sub(/.*-v/,"",ver);
+
+	ptn = pfx;
+	if (ptn ~ /azure/) {ptn = ptn "|dev";}
+	if (ptn ~ /dev/  ) {ptn = ptn "|base";}
+	ptn = "(" ptn ")\\.";
 }
 {$0 = tolower($0);}
-$0 ~ pfx ".1"                 {maj++;}
-$0 ~ pfx ".2" && !maj         {min++;}
-$0 ~ pfx ".3" && !maj && !min {bld++;}
+$0 ~ ptn "1" {bump[1]++;}
+$0 ~ ptn "2" {bump[2]++;}
+$0 ~ ptn "3" {bump[3]++;}
 END {
+	if (maj == 0 && min == 0 && pat == 0) {pat++;}
 	split(ver,sem,".");
-	sem[1] += maj;
-	sem[2]  = maj       ? min : sem[2] + min;
-	sem[3]  = maj + min ? bld : sem[3] + bld;
+	for (i = 3; i >= 1; i--)
+	{
+		if (bump[i] > 0)
+		{
+			sem[i]++;
+			for (j = i+1; j <= 3; j++)
+			{
+				sem[j] = 0;
+			}
+		}
+	}
+
 	printf("%s-v%d.%d.%d",pfx,sem[1],sem[2],sem[3]);
 }'
