@@ -5,80 +5,80 @@
 Nix-Nice Base Layer Manifest:
 No LSB modules are available.
 Distributor ID:	Ubuntu
-Description:	Ubuntu 20.04 LTS
+Description:	Ubuntu 20.04.1 LTS
 Release:	20.04
 Codename:	focal
 Desired=Unknown/Install/Remove/Purge/Hold
 | Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
 |/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
-||/ Name            Version                      Architecture Description
-+++-===============-============================-============-=================================================================
-ii  apvlv           0.1.5+dfsg-3ubuntu1          amd64        PDF viewer with Vim-like behaviour
-ii  at-spi2-core    2.36.0-2                     amd64        Assistive Technology Service Provider Interface (dbus core)
-ii  bash            5.0-6ubuntu1                 amd64        GNU Bourne Again SHell
-ii  bash-completion 1:2.10-1ubuntu1              all          programmable completion for the bash shell
-ii  busybox         1:1.30.1-4ubuntu6            amd64        Tiny utilities for small and embedded systems
-ii  ca-certificates 20190110ubuntu1              all          Common CA certificates
-ii  colordiff       1.0.18-1                     all          tool to colorize 'diff' output
-ii  coreutils       8.30-3ubuntu2                amd64        GNU core utilities
-ii  curl            7.68.0-1ubuntu2              amd64        command line tool for transferring data with URL syntax
-ii  dbus-x11        1.12.16-2ubuntu2             amd64        simple interprocess messaging system (X11 deps)
-ii  ddgr            1.7+git20190928.bccdc92-2    all          DuckDuckGo from the terminal
-ii  diffutils       1:3.7-3                      amd64        File comparison utilities
-ii  fonts-dejavu    2.37-1                       all          metapackage to pull in fonts-dejavu-core and fonts-dejavu-extra
-ii  gnupg           2.2.19-3ubuntu2              all          GNU privacy guard - a free PGP replacement
-ii  gnuplot-nox     5.2.8+dfsg1-2                amd64        Command-line driven interactive plotting program. No-X package
-ii  httping         2.5-5                        amd64        ping-like program for http-requests
-ii  imagemagick     8:6.9.10.23+dfsg-2.1ubuntu11 amd64        image manipulation programs -- binaries
-ii  iputils-ping    3:20190709-3                 amd64        Tools to test the reachability of network hosts
-ii  jq              1.6-1                        amd64        lightweight and flexible command-line JSON processor
-ii  less            551-1                        amd64        pager program similar to more
-ii  libxtst6:amd64  2:1.2.3-1                    amd64        X11 Testing -- Record extension library
-ii  locales         2.31-0ubuntu9                all          GNU C Library: National Language (locale) data [support]
-ii  lynx            2.9.0dev.5-1                 amd64        classic non-graphical (text-mode) web browser
-ii  meld            3.20.2-1ubuntu1              all          graphical tool to diff and merge files
-ii  ministat        20150715-1build1             amd64        simple tool for statistical comparison of data sets
-ii  ncurses-term    6.2-0ubuntu2                 all          additional terminal type definitions
-ii  neovim          0.4.3-3                      amd64        heavily refactored vim fork
-ii  nnn             3.0-2                        amd64        Free, fast, friendly file manager
-ii  openssh-server  1:8.2p1-4                    amd64        secure shell (SSH) server, for secure access from remote machines
-ii  parallel        20161222-1.1                 all          build and execute command lines from standard input in parallel
-ii  perl            5.30.0-9build1               amd64        Larry Wall's Practical Extraction and Report Language
-ii  poppler-utils   0.86.1-0ubuntu1              amd64        PDF utilities (based on Poppler)
-ii  rsync           3.1.3-8                      amd64        fast, versatile, remote (and local) file-copying tool
-ii  rxvt-unicode    9.22-6build3                 amd64        RXVT-like terminal emulator with Unicode and 256-color support
-ii  sc              7.16-4ubuntu3                amd64        Text-based spreadsheet with VI-like keybindings
-ii  sudo            1.8.31-1ubuntu1              amd64        Provide limited super user privileges to specific users
-ii  tmux            3.0a-2                       amd64        terminal multiplexer
-ii  tree            1.8.0-1                      amd64        displays an indented directory tree, in color
-ii  tzdata          2020a-0ubuntu0.20.04         all          time zone and daylight-saving time data
-ii  wget            1.20.3-1ubuntu1              amd64        retrieves files from the web
-ii  xauth           1:1.1-0ubuntu1               amd64        X authentication utility
-ii  xclip           0.13-1                       amd64        command line interface to X selections
-ii  xsltproc        1.1.34-4                     amd64        XSLT 1.0 command line processor
-ii  yank            1.2.0-1                      amd64        interactively select and yank terminal output to stdout or xsel
-ii  zip             3.0-11build1                 amd64        Archiver for .zip files
-toybox 0.8.3
+||/ Name            Version                        Architecture Description
++++-===============-==============================-============-=================================================================
+ii  apvlv           0.1.5+dfsg-3ubuntu1            amd64        PDF viewer with Vim-like behaviour
+ii  at-spi2-core    2.36.0-2                       amd64        Assistive Technology Service Provider Interface (dbus core)
+ii  bash            5.0-6ubuntu1.1                 amd64        GNU Bourne Again SHell
+ii  bash-completion 1:2.10-1ubuntu1                all          programmable completion for the bash shell
+ii  busybox         1:1.30.1-4ubuntu6.3            amd64        Tiny utilities for small and embedded systems
+ii  ca-certificates 20201027ubuntu0.20.04.1        all          Common CA certificates
+ii  colordiff       1.0.18-1                       all          tool to colorize 'diff' output
+ii  coreutils       8.30-3ubuntu2                  amd64        GNU core utilities
+ii  curl            7.68.0-1ubuntu2.2              amd64        command line tool for transferring data with URL syntax
+ii  dbus-x11        1.12.16-2ubuntu2.1             amd64        simple interprocess messaging system (X11 deps)
+ii  ddgr            1.7+git20190928.bccdc92-2      all          DuckDuckGo from the terminal
+ii  diffutils       1:3.7-3                        amd64        File comparison utilities
+ii  fonts-dejavu    2.37-1                         all          metapackage to pull in fonts-dejavu-core and fonts-dejavu-extra
+ii  gnupg           2.2.19-3ubuntu2                all          GNU privacy guard - a free PGP replacement
+ii  gnuplot-nox     5.2.8+dfsg1-2                  amd64        Command-line driven interactive plotting program. No-X package
+ii  httping         2.5-5                          amd64        ping-like program for http-requests
+ii  imagemagick     8:6.9.10.23+dfsg-2.1ubuntu11.1 amd64        image manipulation programs -- binaries
+ii  iputils-ping    3:20190709-3                   amd64        Tools to test the reachability of network hosts
+ii  jq              1.6-1                          amd64        lightweight and flexible command-line JSON processor
+ii  less            551-1ubuntu0.1                 amd64        pager program similar to more
+ii  libxtst6:amd64  2:1.2.3-1                      amd64        X11 Testing -- Record extension library
+ii  locales         2.31-0ubuntu9.1                all          GNU C Library: National Language (locale) data [support]
+ii  lynx            2.9.0dev.5-1                   amd64        classic non-graphical (text-mode) web browser
+ii  meld            3.20.2-1ubuntu1                all          graphical tool to diff and merge files
+ii  ministat        20150715-1build1               amd64        simple tool for statistical comparison of data sets
+ii  ncurses-term    6.2-0ubuntu2                   all          additional terminal type definitions
+ii  neovim          0.4.3-3                        amd64        heavily refactored vim fork
+ii  nnn             3.0-2                          amd64        Free, fast, friendly file manager
+ii  openssh-server  1:8.2p1-4ubuntu0.1             amd64        secure shell (SSH) server, for secure access from remote machines
+ii  parallel        20161222-1.1                   all          build and execute command lines from standard input in parallel
+ii  perl            5.30.0-9ubuntu0.2              amd64        Larry Wall's Practical Extraction and Report Language
+ii  poppler-utils   0.86.1-0ubuntu1                amd64        PDF utilities (based on Poppler)
+ii  rsync           3.1.3-8                        amd64        fast, versatile, remote (and local) file-copying tool
+ii  rxvt-unicode    9.22-6build3                   amd64        RXVT-like terminal emulator with Unicode and 256-color support
+ii  sc              7.16-4ubuntu3                  amd64        Text-based spreadsheet with VI-like keybindings
+ii  sudo            1.8.31-1ubuntu1.1              amd64        Provide limited super user privileges to specific users
+ii  tmux            3.0a-2ubuntu0.2                amd64        terminal multiplexer
+ii  tree            1.8.0-1                        amd64        displays an indented directory tree, in color
+ii  tzdata          2020d-0ubuntu0.20.04           all          time zone and daylight-saving time data
+ii  wget            1.20.3-1ubuntu1                amd64        retrieves files from the web
+ii  xauth           1:1.1-0ubuntu1                 amd64        X authentication utility
+ii  xclip           0.13-1                         amd64        command line interface to X selections
+ii  xsltproc        1.1.34-4                       amd64        XSLT 1.0 command line processor
+ii  yank            1.2.0-1                        amd64        interactively select and yank terminal output to stdout or xsel
+ii  zip             3.0-11build1                   amd64        Archiver for .zip files
+toybox 0.8.4
 bitwise v0.41
 xsv 0.13.0
 gron version 0.6.0
 trdsql trdsql version v0.7.6
-bat-extras - 3029b67 - 2020-05-15 21:13:15 -0700
-vimrc - 1d312d3 - 2020-05-10 11:06:29 -0400
+bat-extras - 0d9468e - 2020-10-29 01:35:47 -0700
+vimrc - 92dab79 - 2020-07-10 23:39:05 -0400
 .tmux - 2e40091 - 2020-04-21 14:56:12 -0500
 fonts - e80e3eb - 2018-11-11 15:22:30 +0300
- tldr-bash-client version 0.45  http://gitlab.com/pepa65/tldr-bash-client
-fzf - f81feb1 - 2020-05-23 20:51:41 +0900
+ tldr-bash-client version 0.46  http://gitlab.com/pepa65/tldr-bash-client
+fzf - 2983426 - 2020-11-25 13:08:14 +0900
 Desired=Unknown/Install/Remove/Purge/Hold
 | Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
 |/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
 ||/ Name           Version      Architecture Description
 +++-==============-============-============-=============================================================================
-ii  bat            0.15.4       amd64        A cat(1) clone with wings.
+ii  bat            0.17.1       amd64        A cat(1) clone with wings.
 ii  fd             8.1.1        amd64        Simple, fast and user-friendly alternative to find
 ii  hecate         0.0.1        amd64        ?
-ii  hexyl          0.7.0        amd64        A command-line hex viewer.
-ii  ripgrep        12.1.0       amd64        ripgrep is a line-oriented search tool that recursively searches your current
+ii  hexyl          0.8.0        amd64        A command-line hex viewer.
+ii  ripgrep        12.1.1       amd64        ripgrep is a line-oriented search tool that recursively searches your current
 
 
 
@@ -87,42 +87,44 @@ Nix-Nice Developer Manifest:
 Desired=Unknown/Install/Remove/Purge/Hold
 | Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
 |/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
-||/ Name                 Version               Architecture Description
-+++-====================-=====================-============-=====================================================
-ii  default-jre-headless 2:1.11-72             amd64        Standard Java or Java compatible Runtime (headless)
-ii  git                  1:2.25.1-1ubuntu3     amd64        fast, scalable, distributed revision control system
-ii  git-lfs              2.9.2-1               amd64        Git Large File Support
-ii  howdoi               1.1.9-1               all          command line tool for instant coding answers
-ii  libc++1:amd64        1:10.0-50~exp1        amd64        LLVM C++ Standard library
-ii  libnotify4:amd64     0.7.9-1ubuntu2        amd64        sends desktop notifications to a notification daemon
-ii  libnss3:amd64        2:3.49.1-1ubuntu1     amd64        Network Security Service libraries
-ii  libsecret-1-0:amd64  0.20.3-0ubuntu1       amd64        Secret store
-ii  libxkbfile1:amd64    1:1.1.0-1             amd64        X11 keyboard file manipulation library
-ii  libxss1:amd64        1:1.2.3-1             amd64        X11 Screen Saver extension library
-ii  nodejs               10.19.0~dfsg-3ubuntu1 amd64        evented I/O for V8 javascript - runtime executable
-ii  npm                  6.14.4+ds-1ubuntu2    all          package manager for Node.js
-ii  postgresql-client    12+214                all          front-end programs for PostgreSQL (supported version)
-ii  python3-pip          20.0.2-5ubuntu1       all          Python package installer
-ii  python3-setuptools   45.2.0-1              all          Python3 Distutils Enhancements
-ii  python3-wheel        0.34.2-1              all          built-package format for Python
-ii  shellcheck           0.7.0-2build2         amd64        lint tool for shell scripts
-ii  sqitch               0.9999-2              all          sane database change management
-ii  sqlite3              3.31.1-4              amd64        Command line interface for SQLite 3
-flk - 71e9710 - 2020-04-29 21:08:27 +0800
+||/ Name                 Version                 Architecture Description
++++-====================-=======================-============-=====================================================
+ii  default-jre-headless 2:1.11-72               amd64        Standard Java or Java compatible Runtime (headless)
+ii  git                  1:2.25.1-1ubuntu3       amd64        fast, scalable, distributed revision control system
+ii  git-lfs              2.9.2-1                 amd64        Git Large File Support
+ii  howdoi               1.1.9-1                 all          command line tool for instant coding answers
+ii  libc++1:amd64        1:10.0-50~exp1          amd64        LLVM C++ Standard library
+ii  libgbm1:amd64        20.0.8-0ubuntu1~20.04.1 amd64        generic buffer management API -- runtime
+ii  libnotify4:amd64     0.7.9-1ubuntu2          amd64        sends desktop notifications to a notification daemon
+ii  libnss3:amd64        2:3.49.1-1ubuntu1.5     amd64        Network Security Service libraries
+ii  libsecret-1-0:amd64  0.20.3-0ubuntu1         amd64        Secret store
+ii  libxcb-dri3-0:amd64  1.14-2                  amd64        X C Binding, dri3 extension
+ii  libxkbfile1:amd64    1:1.1.0-1               amd64        X11 keyboard file manipulation library
+ii  libxss1:amd64        1:1.2.3-1               amd64        X11 Screen Saver extension library
+ii  nodejs               10.19.0~dfsg-3ubuntu1   amd64        evented I/O for V8 javascript - runtime executable
+ii  npm                  6.14.4+ds-1ubuntu2      all          package manager for Node.js
+ii  postgresql-client    12+214ubuntu0.1         all          front-end programs for PostgreSQL (supported version)
+ii  python3-pip          20.0.2-5ubuntu1.1       all          Python package installer
+ii  python3-setuptools   45.2.0-1                all          Python3 Distutils Enhancements
+ii  python3-wheel        0.34.2-1                all          built-package format for Python
+ii  shellcheck           0.7.0-2build2           amd64        lint tool for shell scripts
+ii  sqitch               0.9999-2                all          sane database change management
+ii  sqlite3              3.31.1-4ubuntu0.2       amd64        Command line interface for SQLite 3
+flk - beabb47 - 2020-11-16 20:27:40 +0800
 usql 0.7.8
-migra - 964aa8a - 2020-05-08 20:06:48 +1000
-v3.1.8-postman.5
-newman 5.0.1
+migra - a0b580e - 2020-11-13 12:25:24 +1100
+7.3.2
+newman 5.2.1
 bash-git-prompt - 148d502 - 2019-11-17 07:17:07 -0500
 Desired=Unknown/Install/Remove/Purge/Hold
 | Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
 |/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
 ||/ Name           Version           Architecture Description
 +++-==============-=================-============-=========================================================
-ii  code           1.45.1-1589445302 amd64        Code editing. Redefined.
-ii  dbeaver-ce     7.0.5             amd64        DBeaver Community
-ii  git-delta      0.1.1             amd64        A syntax highlighter for git.
-ii  osquery        4.1.1-1.linux     amd64        osquery is an operating system instrumentation toolchain.
+ii  code           1.51.1-1605051630 amd64        Code editing. Redefined.
+ii  dbeaver-ce     7.3.0             amd64        DBeaver Community
+ii  git-delta      0.4.4             amd64        Syntax highlighter for git.
+ii  osquery        4.5.1-1.linux     amd64        osquery is an operating system instrumentation toolchain.
 
 
 
@@ -134,7 +136,7 @@ d41d8cd98f00b204e9800998ecf8427e  /etc/skel/.Xauthority
 aa39a5e2e2603394797b9481a66ef455  /etc/skel/.bashrc
 62747c19dbc892a1048f660fd8b08bf7  /etc/skel/.config/bat/config
 6eabaca0699a81a8976bab69d1128b98  /etc/skel/.config/nvim/init.vim
-35f54adf5f3ba197c9f9e7ad6414b81a  /etc/skel/.config/nvim/my_configs.vim
+fc191bf95d0f12c30194111899929c96  /etc/skel/.config/nvim/my_configs.vim
 ab632379e55322293328cbfaa0916af6  /etc/skel/.config/rsync/my_excludes
 1cae5d3f7adbfc3c6794a020e54f4d29  /etc/skel/.config/trdsql/config.json
 118a49c760f3c2829d788f7e47fbfb2b  /etc/skel/.profile
@@ -144,27 +146,31 @@ d375db0459a61cbf271ee6543214aa1c  /etc/skel/.tmux.conf.local
 
 --------------------
 Nix-Nice Executables
-69ba19f1f93bb658e5d68d990663ecb7  /etc/profile.d/nix-nice-00.sh
+7b4de5560c88d4a35834fe654cf64e77  /etc/profile.d/nix-nice-00.sh
 e0c542fc0eef2989cf9c3607252d901c  /etc/profile.d/nix-nice-10-dev.sh
 9538bb8dab4813e0d65eb01b738a04e5  /opt/nix-nice/bin/bomadd
 692c02ab68ca682fb3d9c801c87a81c2  /opt/nix-nice/bin/bomrm
 85e20c8beb63d06990b4ff6d8b3a76db  /opt/nix-nice/bin/branchlist
-83993b6f32c9f6fbb8f57429f0a334e2  /opt/nix-nice/bin/branchsync
+0efab6cdad51c95dcc6f622270280101  /opt/nix-nice/bin/branchsync
 ffa472324e016429350f5822129aa7eb  /opt/nix-nice/bin/cb
+7b85369cc67ded92070463602923731e  /opt/nix-nice/bin/centertext
 1ade02b34619d0622855ca9ac1a4768d  /opt/nix-nice/bin/clone
 262331ea901ced3c2b52ee7645ff9024  /opt/nix-nice/bin/cmphost.sh
+811ae3158786bd11a884d8d6e1867974  /opt/nix-nice/bin/dupefiles
 457c1719dbaa0996aec1deacef5c848b  /opt/nix-nice/bin/finalnewline
-0fd34e661205fcac3757c7e92902a7ad  /opt/nix-nice/bin/gitfind
+195d1eb3b6885ca3d6adf242c56df939  /opt/nix-nice/bin/gitfind
 4b42a5ebfec9e4661799d600d947122e  /opt/nix-nice/bin/gitgrep
-2859d6a6cd8904024816e947d83a660c  /opt/nix-nice/bin/muxmea
-b0cc364f9b4e81ea22a1d2e8b8471a82  /opt/nix-nice/bin/projectfilereconcile
+e6d43c0791b7758998ac1c3981866691  /opt/nix-nice/bin/makeheader
+f1504b20d7c1c3df7c07a9b691019636  /opt/nix-nice/bin/muxmea
+40cf055d9e2310752c0368fd4db1d849  /opt/nix-nice/bin/projectfilereconcile
 6b7a18bf8e6f20107d2bb3d6f64c4bf8  /opt/nix-nice/bin/repolist
 4b11c3e3bd95e432dfdb8d2609dab23b  /opt/nix-nice/bin/reporefresh
-b82a80c671bdcda6587e9afbe520cd23  /opt/nix-nice/bin/rgbat
+a6155215abaeb629b1c5dcc45ddaf6a0  /opt/nix-nice/bin/rgbat
+43bb4613497e82fe7b617ba65be8693e  /opt/nix-nice/bin/showfiles
 3a5c13e862c1001732a220170d85826e  /opt/nix-nice/bin/ssisversioncheck
 a886f411fb0fe2f1d21a1d4236d71881  /opt/nix-nice/bin/submodsetup
 66ca30d37cdca8e76689d17a5ad6149b  /opt/nix-nice/bin/urlencode
-47d993ec30feea31356eafdb845d9fa0  /opt/nix-nice/etc/manifest.txt
+0c861035ab3cf793f1bc89c3a52b5026  /opt/nix-nice/etc/manifest.txt
 99bc826296648cd70d69fcbde10ed1c0  /opt/nix-nice/sbin/container-startup.sh
 e52f1985db56e490f481bf76bcc9d574  /opt/nix-nice/sbin/create-links.sh
 b4019911b8e5ed90e0103e5f463993b5  /opt/nix-nice/sbin/create-users.sh
