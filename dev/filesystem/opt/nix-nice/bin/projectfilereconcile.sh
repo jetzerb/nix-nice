@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 IFS=$'\n\t';
 set -euo pipefail;
 
 # XSLT to dump out the list of files in a project
-read -r -d '' XSLT <<'EOF' || true
+read -r -d '' xslt <<'EOF' || true
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xsl:stylesheet version="1.0"
@@ -45,7 +45,7 @@ read -r -d '' XSLT <<'EOF' || true
 </xsl:stylesheet>
 EOF
 
-#echo "$?"; echo "$XSLT"; # debugging...
+#echo "$?"; echo "$xslt"; # debugging...
 
 
 # Function to print out underlined headers for the diff output
@@ -64,20 +64,19 @@ mkHdr() {
 # Now list all files on the filesystem and compare with the project file
 
 # jump to top of the repo, and find all directories containing a project file
-REPODIR=$(git rev-parse --show-toplevel);
-echo "Checking Project Files Under $REPODIR";
-dirname $(find "$REPODIR" -iname '*.*proj') 2>/dev/null |
+repodir=$(git rev-parse --show-toplevel);
+echo "Checking Project Files Under $repodir";
+find "$repodir" -iname '*.*proj' -exec dirname {} \; 2>/dev/null |
 sort -u |
-while read -r DIR
+while read -r dir
 do
-	cd "$REPODIR";
-	cd "$DIR";
-	echo ${PWD#$REPODIR/};
+	cd "$dir";
+	echo "${PWD#$repodir/}";
 	/bin/ls -1 | sed -n '/proj$/{s/^/  /;p;}';
 	echo;
 	sdiff -s -w 200 \
 		<(mkHdr "Filesystem"; git ls-files | grep -v '\.[a-z]*proj$' |sort -f |uniq -c) \
-		<(mkHdr "Project File"; xsltproc <(echo "$XSLT") *.*proj |sort -f | uniq -c) \
-		|| (ERR=$?; [ "$ERR" -eq "1" ] || echo "Error $ERR in sdiff";);
+		<(mkHdr "Project File"; xsltproc <(echo "$xslt") ./*.*proj |sort -f | uniq -c) \
+		|| (err=$?; [ "$err" -eq "1" ] || echo "Error $err in sdiff";);
 	echo -e "\n";
 done;
