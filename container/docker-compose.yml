@@ -1,0 +1,33 @@
+version: "3.7"
+
+services:
+        nix-nice:
+                image: jetzerb/nix-nice:azure-latest
+                container_name: nix-nice
+                hostname: nix-nice
+                ports:
+                        - "9922:22"
+                volumes:
+                        - userdata:/home
+                        - /mnt/c/Users:/hosthome
+                environment:
+                        MYTZ: America/Chicago
+                        MYLOCALE: en_US.utf8
+                        MYGITURL: https://dev.azure.com/svac
+
+        postgres:
+                image: postgis/postgis:13-master
+                container_name: postgres
+                hostname: postgres
+                ports:
+                        - "65432:5432"
+                volumes:
+                        - pg-data:/var/lib/postgresql/data
+                environment:
+                        POSTGRES_PASSWORD: Sva16015
+
+volumes:
+        userdata:
+                name: userdata
+        pg-data:
+                name: pg-data
