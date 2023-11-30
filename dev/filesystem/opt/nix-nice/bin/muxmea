@@ -63,7 +63,13 @@ fi;
 
 
 # jump into existing session, or create a new one
-if tmux has-session -t "$session" 2>/dev/null
+#
+# NOTE: has-session is not an exact match but instead returns true if the specified session
+#       name matches the first characters of an existing session.  For example, if you have
+#       a session called "ABC 123", then `tmux has-session -t "AB"` returns true, so if we
+#       use that it'd be impossible to create a session "ABC" if "ABC 123" already exists.
+#if tmux has-session -t "$session" 2>/dev/null
+if grep '^'"$session"': ' <(tmux ls)
 then
 	echo "Attaching to existing session '$session'";
 	tmux attach -t "$session";
