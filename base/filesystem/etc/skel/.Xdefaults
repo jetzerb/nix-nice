@@ -40,4 +40,10 @@ URxvt*cursorUnderline: true
 !
 ! urxvt comes bundled with several perl extensions (see output of
 ! "dpkg -L rxvt-unicode").  Take advantage of whichever you like here:
-URxvt.perl-ext-common: font-size
+URxvt.perl-ext-common: font-size,selection
+!
+! Include the unicode vertical bar used by tmux as a word boundary
+! This is the string found in the urxvt source code, with the
+! vertical bar used by tmux (hex e2 94 82) appended
+! NOTE: Only works if the perl "selection" extension is active
+URxvt.cutchars: \"&'()*,;<=>?@[\\]^`{|}│
