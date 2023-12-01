@@ -216,6 +216,8 @@ git config --system mergetool.meld.cmd 'meld "$LOCAL" "$BASE" "$REMOTE" --output
 git config --system url.MYGITURL.insteadOf work:; \
 git config --system alias.hist  "log --format='%C(auto)%h |       %ai | %an | %D | %s' --graph"; \
 git config --system alias.histc "log --format='%C(auto)%h | %ci | %ai | %an | %D | %s' --graph"; \
+git config --system core.commentChar ';'; : so we can use #nnnnn to reference our work items; \
+git config --system commit.template /opt/nix-nice/etc/git/commit.template; \
 #
 #
 # Enable git-specific vimrc features that the base image disabled

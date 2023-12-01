@@ -32,27 +32,74 @@ cd "$(git rev-parse --show-toplevel)";
 
 for branch in $(git branch -a --format="%(refname)" |sed 's!^refs/[^/][^/]*/!!')
 do
-	git ls-tree -r  --full-name "$branch" |
-	awk -v branch="$branch" -v ptn="$pattern" -F "\t" '
-		tolower($2) ~ tolower(ptn) {sub(/.* /,"",$1); print $1 FS $2 FS branch;}'
+	echo ">>>>$branch";
+	git ls-tree -r  --full-name "$branch"
 done |
-sort -t "$tab" -k 2,2 -k 1,1 -k 3,3 |
-while read -r -a info
-do
-	hash=${info[0]}; file=${info[1]}; branch=${info[2]};
-	if [ "$file" != "$prevfile" ]
-	then
-		[ -n "$commit" ] && echo -e "\n\n"; # vertical space after previous file
-		echo -e "${yellow}${file}${normal}";
-		prevfile="$file"; commit="";
-	fi;
-	if [ "$hash" != "$prevhash" ]
-	then
-		[ -n "$commit" ] && echo;  #vertical space after commit
-		# use sed below because head sporadically fails for unknown reason
-		commit=$(git log --format="%h : %ae : %aD : %s" "$branch" -- "$file" |sed -n '1p');
-		echo -e "\t${cyan}${commit}${normal}";
-		prevhash=$hash;
-	fi;
-	echo -e "\t\t$branch";
-done;
+awk -v ptn="$pattern" -v q="'" -F "$tab" '
+BEGIN {
+	fmt = "%h-%ai-%an-%s";
+	gsub(/-/,"\t",fmt);
+	cmd = "git log --format=" q fmt q " ";
+}
+
+/^>>>>/ {sub(/^>>>>/,""); branch = $0; next;}
+
+tolower($2) ~ tolower(ptn) {
+	sub(/.* /,"",$1);
+	hash = $1;
+	file = $2;
+
+	tmp = cmd branch " -- " q file q;
+	tmp | getline commit;
+
+	#    1,    2,      3,    4,      5,       6,      7
+	# file, hash, commit, date, author, subject, branch
+	list[idx++] = file FS hash FS commit FS branch;
+	split(commit,pcs);
+	if (maxDt[file,hash] < pcs[2]) {maxDt[file,hash] = pcs[2];}
+}
+END {
+	for (idx in list)
+	{
+		line = list[idx];
+		split(line,pcs);
+		print line FS maxDt[pcs[1],pcs[2]];
+	}
+}
+' |
+sort -t "$tab" -k 1,1 -k 8,8r -k 4,4r -k 7,7 |
+awk -v yellow="$yellow" -v cyan="$cyan" -v normal="$normal" -F "$tab" '
+{
+	file    = $1;
+	hash    = $2;
+	commit  = $3;
+	date    = $4;
+	author  = $5;
+	subject = $6;
+	branch  = $7;
+
+	if (file != prevFile)
+	{
+		if (prevFile) {printf("\n\n\n");}
+		print yellow file normal;
+		prevFile = file;
+		prevHash = "";
+	}
+
+	if (hash != prevHash)
+	{
+		if (prevHash) {printf("\n\n");}
+		print FS hash;
+		prevHash   = hash;
+		prevCommit = "";
+	}
+
+	if (commit != prevCommit)
+	{
+		if (prevCommit) {printf("\n");}
+		printf("%s%s%s%s | %s | %s | %s%s\n",FS,FS,cyan,commit,date,author,subject,normal);
+		prevCommit = commit;
+	}
+
+	print FS FS FS branch;
+}'

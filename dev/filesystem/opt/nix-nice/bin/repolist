@@ -47,7 +47,12 @@ case "$url" in
 		echo "Unhandled source control provider: '$url'"
 		exit 1;;
 esac |
-trdsql -driver sqlite3 -ijson $output_fmt '
-	select fork, size, name, created_at, updated_at, description
+trdsql -driver sqlite3 -ijson $output_fmt "
+	select fork
+	      ,cast(size/1024.0 as int) as size_kB
+	      ,name
+	      ,coalesce(nullif(created_at ,''),'n/a') as created_at
+	      ,coalesce(nullif(updated_at ,''),'n/a') as updated_at
+	      ,coalesce(nullif(description,''),'n/a') as description
 	from -
-	order by fork, name';
+	order by fork, name";

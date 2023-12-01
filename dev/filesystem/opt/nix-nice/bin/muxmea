@@ -1,8 +1,15 @@
-#!/bin/sh
+#!/usr/bin/env bash
+IFS=$'\n\t';
+set -euo pipefail;
+
 
 # Create a tmux session with a half dozen windows.
-# Specify a file glob matching a project under
+# Specify a regex matching a project under
 #  ~/src/[code|review]/[provider]/
+#
+# The tmux session name will be the project name.
+# Override with a 2nd argument if desired.
+#
 
 if [ -z "$1" ]
 then
@@ -16,16 +23,35 @@ case "$1" in
 		exit 0;
 esac;
 
-for base in ~/src ~/hosthome/src
-do
-	projdir=$(find $base -mindepth 3 -maxdepth 3 -type d -iname "*$1*" | sort -f | head -1);
-	[ -n "$projdir" ] && break;
-done;
-projdir=${projdir#$base/*/};
-session=$(echo "$1" |tr '[:lower:]' '[:upper:]');
+# capture all projects matching the pattern
+mapfile -t -O 1 projInfo < <(
+	find {~,~/hosthome}/src/{code,review} -mindepth 2 -maxdepth 2 -type d -iname '*'"$1"'*'|
+	awk -F '/' '{print $(NF-1) "/" $NF;}' |
+	sort --ignore-case --unique
+);
+
+# if multiple matches, ask which one to use
+idx=1;
+case ${#projInfo[@]} in
+	0) echo "No matching project found on the filesystem."; exit 1;;
+	1) ;;
+	*)
+		printf "%s\n" "${projInfo[@]}" | nl;
+		read -rp "Which one? " idx;
+		;;
+esac;
+if [ "$idx" -gt 0 ] 2> /dev/null && [ "$idx" -le "${#projInfo[@]}" ] 2> /dev/null
+then
+	IFS='/' read -ra proj <<<"${projInfo[idx]}";
+else
+	echo "Invalid selection";
+	exit 1;
+fi;
+session="$(tr '[:lower:]' '[:upper:]' <<<"${2:-${proj[1]}}")";
+
 
 # detach from any existing session first
-if [ -n "$TMUX" ]
+if [ -n "${TMUX:-}" ]
 then
 	session=$(tmux display-message -p '#{session_name}');
 	echo "Already in session '$session', and it's impossible to create a sibling session.";
@@ -37,7 +63,13 @@ fi;
 
 
 # jump into existing session, or create a new one
-if tmux has-session -t "$session" 2>/dev/null
+#
+# NOTE: has-session is not an exact match but instead returns true if the specified session
+#       name matches the first characters of an existing session.  For example, if you have
+#       a session called "ABC 123", then `tmux has-session -t "AB"` returns true, so if we
+#       use that it'd be impossible to create a session "ABC" if "ABC 123" already exists.
+#if tmux has-session -t "$session" 2>/dev/null
+if grep '^'"$session"': ' <(tmux ls)
 then
 	echo "Attaching to existing session '$session'";
 	tmux attach -t "$session";
@@ -46,14 +78,16 @@ else
 	exist=0;
 	for dir in code review
 	do
+		tgtDir="$HOME/src/$dir/${projInfo[idx]}";
+		[ -d "$tgtDir" ] || tgtDir="${tgtDir/$HOME/$HOME/hosthome}";
 		for iter in A B
 		do
 			if [ $exist -eq 0 ]
 			then
-				tmux new-session -s "$session" -n "$dir$iter" -d -c "$base/$dir/$projdir";
+				tmux new-session -s "$session" -n "$dir$iter" -d -c "$tgtDir";
 				exist=1;
 			else
-				tmux new-window -t "$session" -n "$dir$iter" -c "$base/$dir/$projdir";
+				tmux new-window -t "$session" -n "$dir$iter" -c "$tgtDir";
 			fi;
 		done;
 	done;

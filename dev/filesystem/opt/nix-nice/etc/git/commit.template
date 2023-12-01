@@ -1,0 +1,20 @@
+; If merged, this commit will--------------------v
+#12345 Fix or Implement all the things
+; Keep this to 50 characters or less-------------^
+; Format: #nnnnn description, where #nnnnn is a work item reference
+
+; Select the appropriate change in Semantic Version, if appropriate
+Version Bump: Major|Minor|Patch
+
+; Fill out one or more of the following as appropriate.
+; You can include several of the same type if appropriate.
+; Do not include line breaks; each entry must be a single line
+Changelog: Added: Some new functionality
+Changelog: Changed: Updated something
+Changelog: Deprecated: Something will be removed soon
+Changelog: Removed: Something we previously warned you about has been removed
+Changelog: Fixed: Something that was broken is now much better
+Changelog: Security: Something that was insecure is now harder to hack
+
+; Long, rambling comment if desired:
+...Enter any notes here.  Please use linebreaks here...

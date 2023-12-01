@@ -76,20 +76,20 @@ col_doc=(
 "- AheadBy  = number of commits in this branch but not in the base branch"
 ""
 'Branch Stats (pertaining only to the "AheadBy" commits, or all commits in the base branch)'
-"- FileModCnt        = count of file modifications"
-"- LineModCnt        = total lines modified across all files and commits"
-"- AuthorCnt         = number of distinct authors"
-"- FirstDt           = date of first commit"
-"- FirstAuthor       = author of first commit"
-"- LastDt            = date of most recent commit"
-"- LastAuthor        = author of most recent commit"
-"- PrimaryAuthor     = author with the most activity"
-"- PrimaryCommitCnt  = primary author commit count${sep}short${sep}medium"
-"- PrimaryFileModCnt = primary author file modification count${sep}short${sep}medium"
-"- PrimaryLineModCnt = primary author line modification count${sep}short${sep}medium"
+"- FileModCnt        = count of file modifications${sep}quick"
+"- LineModCnt        = total lines modified across all files and commits${sep}quick"
+"- AuthorCnt         = number of distinct authors${sep}quick"
+"- FirstDt           = date of first commit${sep}quick"
+"- FirstAuthor       = author of first commit${sep}quick"
+"- LastDt            = date of most recent commit${sep}quick"
+"- LastAuthor        = author of most recent commit${sep}quick"
+"- PrimaryAuthor     = author with the most activity${sep}quick"
+"- PrimaryCommitCnt  = primary author commit count${sep}quick${sep}short${sep}medium"
+"- PrimaryFileModCnt = primary author file modification count${sep}quick${sep}short${sep}medium"
+"- PrimaryLineModCnt = primary author line modification count${sep}quick${sep}short${sep}medium"
 );
 
-layout_options=(short medium long);
+layout_options=(quick short medium long);
 declare -A columns=(); # to hold column lists for each layout option
 opt=("${layout_options[@]}"); # copy of layout options used in the parsing of the above
 for (( i=0; i<${#col_doc[@]}; i++ ))
@@ -184,6 +184,11 @@ desired columns: $layout
 ${out_raw:-}
 EOF
 
+case "$layout" in
+	*Cnt*|*First*|*Last*|*Primary*) wantDetail=1;;
+	*) wantDetail=0;;
+esac;
+
 # Gather stats for all the branches we care about
 print_hdr=1;
 for branch in "${branch_list[@]}"
@@ -207,6 +212,8 @@ do
 	# if base branch, list ALL commits. otherwise just those in the branch but not in the base
 	cmd='git log --format=">>${sep}%ai${sep}%an"  --shortstat --no-merges "$base_branch"';
 	[ "$branch" = "$base_branch" ] || cmd="$cmd"'.."$branch"';
+
+	[ "$wantDetail" -eq 0 ] && cmd="#";
 
 	eval "$cmd" |
 	awk -F "$sep" -v OFS="$sep" '
